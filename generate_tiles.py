@@ -51,10 +51,103 @@ def dot_symbol(n: int) -> str:
   </g>"""
 
 def bamboo_symbol(n: int) -> str:
-    # (All bamboo 1–9 blocks included here exactly as previously generated)
-    # To keep this message readable, I won’t repeat them — but your script
-    # will contain the full set exactly as we built earlier.
-    raise NotImplementedError("Paste bamboo 1–9 blocks here")
+    if n == 1:
+        return """<g fill="#0f5a24">
+  <path d="M50 45 L45 70 L55 70 Z"/>
+  <circle cx="50" cy="85" r="6"/>
+</g>"""
+
+    if n == 2:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="40" y1="40" x2="40" y2="100"/>
+  <line x1="60" y1="40" x2="60" y2="100"/>
+  <line x1="35" y1="70" x2="45" y2="70"/>
+  <line x1="55" y1="70" x2="65" y2="70"/>
+</g>"""
+
+    if n == 3:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="30" y1="40" x2="30" y2="100"/>
+  <line x1="50" y1="40" x2="50" y2="100"/>
+  <line x1="70" y1="40" x2="70" y2="100"/>
+</g>
+<g stroke="#0f5a24" stroke-width="3">
+  <line x1="25" y1="55" x2="35" y2="55"/>
+  <line x1="45" y1="70" x2="55" y2="70"/>
+  <line x1="65" y1="85" x2="75" y2="85"/>
+</g>"""
+
+    if n == 4:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="30" y1="40" x2="30" y2="100"/>
+  <line x1="70" y1="40" x2="70" y2="100"/>
+  <line x1="50" y1="55" x2="50" y2="85"/>
+</g>"""
+
+    if n == 5:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="30" y1="40" x2="30" y2="100"/>
+  <line x1="50" y1="40" x2="50" y2="100"/>
+  <line x1="70" y1="40" x2="70" y2="100"/>
+</g>
+<g stroke="#0f5a24" stroke-width="3">
+  <line x1="25" y1="55" x2="35" y2="55"/>
+  <line x1="45" y1="55" x2="55" y2="55"/>
+  <line x1="65" y1="55" x2="75" y2="55"/>
+  <line x1="25" y1="85" x2="35" y2="85"/>
+  <line x1="45" y1="85" x2="55" y2="85"/>
+  <line x1="65" y1="85" x2="75" y2="85"/>
+</g>"""
+
+    if n == 6:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="35" y1="40" x2="35" y2="100"/>
+  <line x1="65" y1="40" x2="65" y2="100"/>
+</g>
+<g stroke="#0f5a24" stroke-width="3">
+  <line x1="30" y1="55" x2="40" y2="55"/>
+  <line x1="30" y1="70" x2="40" y2="70"/>
+  <line x1="30" y1="85" x2="40" y2="85"/>
+  <line x1="60" y1="55" x2="70" y2="55"/>
+  <line x1="60" y1="70" x2="70" y2="70"/>
+  <line x1="60" y1="85" x2="70" y2="85"/>
+</g>"""
+
+    if n == 7:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="30" y1="40" x2="30" y2="70"/>
+  <line x1="50" y1="40" x2="50" y2="70"/>
+  <line x1="70" y1="40" x2="70" y2="70"/>
+  <line x1="50" y1="70" x2="50" y2="100"/>
+</g>"""
+
+    if n == 8:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="25" y1="40" x2="25" y2="70"/>
+  <line x1="40" y1="40" x2="40" y2="70"/>
+  <line x1="60" y1="40" x2="60" y2="70"/>
+  <line x1="75" y1="40" x2="75" y2="70"/>
+  <line x1="25" y1="70" x2="25" y2="100"/>
+  <line x1="40" y1="70" x2="40" y2="100"/>
+  <line x1="60" y1="70" x2="60" y2="100"/>
+  <line x1="75" y1="70" x2="75" y2="100"/>
+</g>"""
+
+    if n == 9:
+        return """<g stroke="#0f5a24" stroke-width="3" stroke-linecap="round">
+  <line x1="30" y1="40" x2="30" y2="60"/>
+  <line x1="50" y1="40" x2="50" y2="60"/>
+  <line x1="70" y1="40" x2="70" y2="60"/>
+  <line x1="30" y1="60" x2="30" y2="80"/>
+  <line x1="50" y1="60" x2="50" y2="80"/>
+  <line x1="70" y1="60" x2="70" y2="80"/>
+  <line x1="30" y1="80" x2="30" y2="100"/>
+  <line x1="50" y1="80" x2="50" y2="100"/>
+  <line x1="70" y1="80" x2="70" y2="100"/>
+</g>"""
+
+    raise ValueError("Invalid bamboo number")
+
 
 def char_symbol(n: int) -> str:
     numerals = {1:"一",2:"二",3:"三",4:"四",5:"五",6:"六",7:"七",8:"八",9:"九"}
@@ -92,6 +185,7 @@ def season_symbol(ch: str) -> str:
     return f"""<text x="50" y="85" text-anchor="middle" font-size="50"
       fill="#0b4f9c" stroke="#083366" stroke-width="2">{ch}</text>"""
 
+
 # ---------- Build SYMBOLS dictionary ----------
 
 SYMBOLS = {}
@@ -101,7 +195,8 @@ for i in range(1, 10):
     SYMBOLS[f"dot-{i}"] = dot_symbol(i)
 
 # Bamboo
-# (Paste bamboo 1–9 here exactly as we generated earlier)
+for i in range(1, 10):
+    SYMBOLS[f"bamboo-{i}"] = bamboo_symbol(i)
 
 # Characters
 for i in range(1, 10):
@@ -127,6 +222,7 @@ SYMBOLS["season-1"] = season_symbol("春")
 SYMBOLS["season-2"] = season_symbol("夏")
 SYMBOLS["season-3"] = season_symbol("秋")
 SYMBOLS["season-4"] = season_symbol("冬")
+
 
 # ---------- Generator ----------
 
