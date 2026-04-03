@@ -109,6 +109,50 @@ const top = pos.y * 100 - pos.z * 8;
 
   updateBlockedStates();
 }
+function findHintPair() {
+  const playable = tiles
+    .map((t, i) => ({ tile: t, index: i }))
+    .filter(obj => !obj.tile.matched)
+    .filter(obj => {
+      const el = document.querySelector(`.tile[data-index="${obj.index}"]`);
+      return el && !el.classList.contains("blocked");
+    });
+
+  for (let i = 0; i < playable.length; i++) {
+    for (let j = i + 1; j < playable.length; j++) {
+      if (playable[i].tile.name === playable[j].tile.name) {
+        return [playable[i].index, playable[j].index];
+      }
+    }
+  }
+
+  return null;
+}
+function showHint() {
+  const pair = findHintPair();
+  const status = document.getElementById("status");
+
+  if (!pair) {
+    status.textContent = "No moves available.";
+    return;
+  }
+
+  const [i1, i2] = pair;
+
+  const el1 = document.querySelector(`.tile[data-index="${i1}"]`);
+  const el2 = document.querySelector(`.tile[data-index="${i2}"]`);
+
+  el1.classList.add("selected");
+  el2.classList.add("selected");
+
+  status.textContent = "Hint shown.";
+
+  setTimeout(() => {
+    el1.classList.remove("selected");
+    el2.classList.remove("selected");
+    status.textContent = "";
+  }, 1000);
+}
 
 // ------------------------------
 // BLOCKING LOGIC
