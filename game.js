@@ -182,12 +182,13 @@ function shuffleTiles() {
     const tile = tiles[tileIndex];
     const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
     if (el) {
-      el.style.backgroundImage = `url('png/${tile.name}')`;
+      el.src = "png/" + tile.name;   // ← REAL FIX
     }
   });
 
   updateBlockedStates();
 }
+
 
 // ------------------------------
 // BLOCKING LOGIC
