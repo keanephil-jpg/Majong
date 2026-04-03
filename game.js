@@ -1,12 +1,21 @@
+// ------------------------------
+// GLOBAL STATE
+// ------------------------------
 let layout = [];
 let tiles = [];
 let firstSelected = null;
 
+// ------------------------------
+// LOAD LAYOUT FILE
+// ------------------------------
 async function loadLayout() {
   const response = await fetch("layout-turtle.json");
   layout = await response.json();
 }
-// List of tile image filenames (must exist in png/)
+
+// ------------------------------
+// TILE FILENAMES
+// ------------------------------
 const tileNames = [
   "dot-1.png",
   "dot-2.png",
@@ -19,10 +28,9 @@ const tileNames = [
   "char-3.png"
 ];
 
-// We’ll make pairs of each tile
-let tiles = [];
-let firstSelected = null;
-
+// ------------------------------
+// CREATE TILE ELEMENT
+// ------------------------------
 function createTileElement(tile, index) {
   const img = document.createElement("img");
   img.src = "png/" + tile.name;
@@ -33,6 +41,9 @@ function createTileElement(tile, index) {
   return img;
 }
 
+// ------------------------------
+// SHUFFLE ARRAY
+// ------------------------------
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -40,6 +51,9 @@ function shuffle(array) {
   }
 }
 
+// ------------------------------
+// SET UP BOARD
+// ------------------------------
 async function setupBoard() {
   await loadLayout();
 
@@ -66,7 +80,7 @@ async function setupBoard() {
 
     const el = createTileElement(tile, index);
 
-    // Convert tile coords to pixels
+    // Convert tile coords to pixels (overlapping)
     const left = pos.x * 60 - pos.z * 5;
     const top = pos.y * 80 - pos.z * 5;
 
@@ -77,7 +91,13 @@ async function setupBoard() {
     board.appendChild(el);
   });
 
- function updateBlockedStates() {
+  updateBlockedStates();
+}
+
+// ------------------------------
+// BLOCKING LOGIC
+// ------------------------------
+function updateBlockedStates() {
   const board = document.getElementById("board");
   const els = board.querySelectorAll(".tile");
 
@@ -123,16 +143,14 @@ async function setupBoard() {
   });
 }
 
-
-
+// ------------------------------
+// TILE CLICK HANDLER
+// ------------------------------
 function onTileClick(e) {
   const index = parseInt(e.currentTarget.dataset.index, 10);
   const tile = tiles[index];
   if (tile.matched) return;
-  if (e.currentTarget.classList.contains("blocked")) {
-  return;
-}
-
+  if (e.currentTarget.classList.contains("blocked")) return;
 
   const board = document.getElementById("board");
   const status = document.getElementById("status");
@@ -173,6 +191,8 @@ function onTileClick(e) {
       if (tiles.every(t => t.matched)) {
         status.textContent = "You cleared the board! 🎉";
       }
+
+      updateBlockedStates();
     }, 200);
   } else {
     // No match
@@ -185,6 +205,9 @@ function onTileClick(e) {
   }
 }
 
+// ------------------------------
+// INITIALISE
+// ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   setupBoard();
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
