@@ -39,7 +39,6 @@ const tileNames = [
   "season-1.png","season-2.png","season-3.png","season-4.png"
 ];
 
-
 // ------------------------------
 // CREATE TILE ELEMENT
 // ------------------------------
@@ -77,42 +76,41 @@ async function setupBoard() {
   // Build pairs
   tiles = [];
   tileNames.forEach(name => {
- // Standard Mahjong: 4 copies of each tile
-for (let i = 0; i < 4; i++) {
-  tiles.push({ name, matched: false });
-}
-
-  });
-
-function shuffleTiles() {
-  // Collect indices of all unmatched tiles
-  const remainingIndices = tiles
-    .map((t, i) => (!t.matched ? i : null))
-    .filter(i => i !== null);
-
-  // Collect their names
-  const remainingNames = remainingIndices.map(i => tiles[i].name);
-
-  // Shuffle the names only
-  shuffle(remainingNames);
-
-  // Put shuffled names back onto the same tile indices
-  remainingIndices.forEach((tileIndex, k) => {
-    tiles[tileIndex].name = remainingNames[k];
-  });
-
-  // Update DOM tile faces for those tiles
-  remainingIndices.forEach(tileIndex => {
-    const tile = tiles[tileIndex];
-    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
-    if (el) {
-      el.style.backgroundImage = `url('png/${tile.name}')`;
+    // Standard Mahjong: 4 copies of each tile
+    for (let i = 0; i < 4; i++) {
+      tiles.push({ name, matched: false });
     }
+  });
+
+  // Shuffle initial tiles
+  shuffle(tiles);
+
+  // Place tiles according to layout
+  layout.forEach((pos, index) => {
+    const tile = tiles[index];
+    tile.x = pos.x;
+    tile.y = pos.y;
+    tile.z = pos.z;
+
+    const el = createTileElement(tile, index);
+
+    // Convert tile coords to pixels (overlapping)
+    const left = pos.x * 70 - pos.z * 8;
+    const top = pos.y * 100 - pos.z * 8;
+
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.zIndex = pos.z * 10;
+
+    board.appendChild(el);
   });
 
   updateBlockedStates();
 }
 
+// ------------------------------
+// HINT LOGIC
+// ------------------------------
 function findHintPair() {
   const playable = tiles
     .map((t, i) => ({ tile: t, index: i }))
@@ -132,6 +130,7 @@ function findHintPair() {
 
   return null;
 }
+
 function showHint() {
   const pair = findHintPair();
   const status = document.getElementById("status");
@@ -157,29 +156,32 @@ function showHint() {
     status.textContent = "";
   }, 1000);
 }
+
+// ------------------------------
+// SHUFFLE TILES (NAMES-ONLY)
+// ------------------------------
 function shuffleTiles() {
-  // Get all unmatched tiles
-  const remaining = tiles.filter(t => !t.matched);
+  // Collect indices of all unmatched tiles
+  const remainingIndices = tiles
+    .map((t, i) => (!t.matched ? i : null))
+    .filter(i => i !== null);
 
-  // Fisher–Yates shuffle
-  for (let i = remaining.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
-  }
+  // Collect their names
+  const remainingNames = remainingIndices.map(i => tiles[i].name);
 
-  // Put shuffled tiles back into the main array
-  let idx = 0;
-  for (let i = 0; i < tiles.length; i++) {
-    if (!tiles[i].matched) {
-      tiles[i] = remaining[idx++];
-    }
-  }
+  // Shuffle the names only
+  shuffle(remainingNames);
 
-  // Re-render tile faces
-  const els = document.querySelectorAll(".tile");
-  els.forEach((el, i) => {
-    const tile = tiles[i];
-    if (!tile.matched) {
+  // Put shuffled names back onto the same tile indices
+  remainingIndices.forEach((tileIndex, k) => {
+    tiles[tileIndex].name = remainingNames[k];
+  });
+
+  // Update DOM tile faces for those tiles
+  remainingIndices.forEach(tileIndex => {
+    const tile = tiles[tileIndex];
+    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
+    if (el) {
       el.style.backgroundImage = `url('png/${tile.name}')`;
     }
   });
@@ -306,5 +308,4 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
   document.getElementById("hint-btn").addEventListener("click", showHint);
   document.getElementById("shuffle-btn").addEventListener("click", shuffleTiles);
-
 });
