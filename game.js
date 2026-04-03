@@ -247,11 +247,10 @@ function onTileClick(e) {
   if (tile.matched) return;
   if (e.currentTarget.classList.contains("blocked")) return;
 
-  const board = document.getElementById("board");
   const status = document.getElementById("status");
-  const allTileEls = board.querySelectorAll(".tile");
 
-  const thisEl = allTileEls[index];
+  // Always get the correct tile element by data-index
+  const thisEl = document.querySelector(`.tile[data-index="${index}"]`);
 
   // If clicking the same tile again, deselect
   if (firstSelected && firstSelected.index === index) {
@@ -278,8 +277,10 @@ function onTileClick(e) {
     tiles[index].matched = true;
 
     setTimeout(() => {
-      allTileEls[firstSelected.index].style.visibility = "hidden";
+      const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
+      el1.style.visibility = "hidden";
       thisEl.style.visibility = "hidden";
+
       firstSelected = null;
       status.textContent = "Match!";
 
@@ -289,16 +290,20 @@ function onTileClick(e) {
 
       updateBlockedStates();
     }, 200);
+
   } else {
     // No match
     setTimeout(() => {
-      allTileEls[firstSelected.index].classList.remove("selected");
+      const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
+      el1.classList.remove("selected");
       thisEl.classList.remove("selected");
+
       firstSelected = null;
       status.textContent = "No match. Try again.";
     }, 400);
   }
 }
+
 
 // ------------------------------
 // INITIALISE
