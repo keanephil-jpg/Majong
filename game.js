@@ -161,33 +161,43 @@ function showHint() {
 // SHUFFLE TILES (NAMES-ONLY)
 // ------------------------------
 function shuffleTiles() {
-  // Collect indices of all unmatched tiles
-  const remainingIndices = tiles
-    .map((t, i) => (!t.matched ? i : null))
-    .filter(i => i !== null);
+  // 1. Identify FREE tiles only
+  const freeIndices = tiles
+    .map((t, i) => ({ tile: t, index: i }))
+    .filter(obj => !obj.tile.matched)
+    .filter(obj => {
+      const el = document.querySelector(`.tile[data-index="${obj.index}"]`);
+      return el && !el.classList.contains("blocked");
+    })
+    .map(obj => obj.index);
 
-  // Collect their names
-  const remainingNames = remainingIndices.map(i => tiles[i].name);
+  // If fewer than 2 free tiles, nothing to shuffle
+  if (freeIndices.length < 2) return;
 
-  // Shuffle the names only
-  shuffle(remainingNames);
+  // 2. Extract their names
+  const freeNames = freeIndices.map(i => tiles[i].name);
 
-  // Put shuffled names back onto the same tile indices
-  remainingIndices.forEach((tileIndex, k) => {
-    tiles[tileIndex].name = remainingNames[k];
+  // 3. Shuffle the names
+  shuffle(freeNames);
+
+  // 4. Put shuffled names back onto the SAME free tile positions
+  freeIndices.forEach((tileIndex, k) => {
+    tiles[tileIndex].name = freeNames[k];
   });
 
-  // Update DOM tile faces for those tiles
-  remainingIndices.forEach(tileIndex => {
+  // 5. Update the DOM images for free tiles
+  freeIndices.forEach(tileIndex => {
     const tile = tiles[tileIndex];
     const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
     if (el) {
-      el.src = "png/" + tile.name;   // ← REAL FIX
+      el.src = "png/" + tile.name;
     }
   });
 
+  // 6. Recalculate blocking
   updateBlockedStates();
 }
+
 
 
 // ------------------------------
