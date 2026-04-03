@@ -17,19 +17,28 @@ async function loadLayout() {
 // TILE FILENAMES
 // ------------------------------
 const tileNames = [
-  "dot-1.png",
-  "dot-2.png",
-  "dot-3.png",
-  "bamboo-1.png",
-  "bamboo-2.png",
-  "bamboo-3.png",
-  "char-1.png",
-  "char-2.png",
-  "char-3.png",
-  "char-4.png",
-  "char-5.png",
-  "char-6.png"
+  // Dots
+  "dot-1.png","dot-2.png","dot-3.png","dot-4.png","dot-5.png","dot-6.png","dot-7.png","dot-8.png","dot-9.png",
+
+  // Bamboo
+  "bamboo-1.png","bamboo-2.png","bamboo-3.png","bamboo-4.png","bamboo-5.png","bamboo-6.png","bamboo-7.png","bamboo-8.png","bamboo-9.png",
+
+  // Characters
+  "char-1.png","char-2.png","char-3.png","char-4.png","char-5.png","char-6.png","char-7.png","char-8.png","char-9.png",
+
+  // Winds
+  "wind-east.png","wind-south.png","wind-west.png","wind-north.png",
+
+  // Dragons
+  "dragon-red.png","dragon-green.png","dragon-white.png",
+
+  // Flowers (singletons)
+  "flower-1.png","flower-2.png","flower-3.png","flower-4.png",
+
+  // Seasons (singletons)
+  "season-1.png","season-2.png","season-3.png","season-4.png"
 ];
+
 
 // ------------------------------
 // CREATE TILE ELEMENT
