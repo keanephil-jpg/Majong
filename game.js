@@ -153,6 +153,35 @@ function showHint() {
     status.textContent = "";
   }, 1000);
 }
+function shuffleTiles() {
+  // Get all unmatched tiles
+  const remaining = tiles.filter(t => !t.matched);
+
+  // Fisher–Yates shuffle
+  for (let i = remaining.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+  }
+
+  // Put shuffled tiles back into the main array
+  let idx = 0;
+  for (let i = 0; i < tiles.length; i++) {
+    if (!tiles[i].matched) {
+      tiles[i] = remaining[idx++];
+    }
+  }
+
+  // Re-render tile faces
+  const els = document.querySelectorAll(".tile");
+  els.forEach((el, i) => {
+    const tile = tiles[i];
+    if (!tile.matched) {
+      el.style.backgroundImage = `url('png/${tile.name}')`;
+    }
+  });
+
+  updateBlockedStates();
+}
 
 // ------------------------------
 // BLOCKING LOGIC
