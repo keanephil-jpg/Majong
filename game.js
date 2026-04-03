@@ -77,14 +77,62 @@ async function setupBoard() {
     board.appendChild(el);
   });
 
-  updateBlockedStates();
+ function updateBlockedStates() {
+  const board = document.getElementById("board");
+  const els = board.querySelectorAll(".tile");
+
+  els.forEach((el, index) => {
+    const tile = tiles[index];
+    if (tile.matched) {
+      el.classList.add("blocked");
+      return;
+    }
+
+    const { x, y, z } = tile;
+
+    // Check if a tile is on top
+    const hasAbove = tiles.some(t =>
+      !t.matched &&
+      t.z === z + 1 &&
+      Math.abs(t.x - x) <= 1 &&
+      Math.abs(t.y - y) <= 1
+    );
+
+    // Check left and right
+    const leftBlocked = tiles.some(t =>
+      !t.matched &&
+      t.z === z &&
+      t.y === y &&
+      t.x === x - 2
+    );
+
+    const rightBlocked = tiles.some(t =>
+      !t.matched &&
+      t.z === z &&
+      t.y === y &&
+      t.x === x + 2
+    );
+
+    const blocked = hasAbove || (leftBlocked && rightBlocked);
+
+    if (blocked) {
+      el.classList.add("blocked");
+    } else {
+      el.classList.remove("blocked");
+    }
+  });
 }
+
 
 
 function onTileClick(e) {
   const index = parseInt(e.currentTarget.dataset.index, 10);
   const tile = tiles[index];
   if (tile.matched) return;
+  if (e.currentTarget.classList.contains("blocked")) {
+  return;
+}
+
 
   const board = document.getElementById("board");
   const status = document.getElementById("status");
