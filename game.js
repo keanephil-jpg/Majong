@@ -84,38 +84,35 @@ for (let i = 0; i < 4; i++) {
 
   });
 
-shuffle(tiles);
+function shuffleTiles() {
+  // Collect indices of all unmatched tiles
+  const remainingIndices = tiles
+    .map((t, i) => (!t.matched ? i : null))
+    .filter(i => i !== null);
 
-// Place tiles according to layout
-layout.forEach((pos, index) => {
-  const tile = tiles[index];
-  tile.x = pos.x;
-  tile.y = pos.y;
-  tile.z = pos.z;
+  // Collect their names
+  const remainingNames = remainingIndices.map(i => tiles[i].name);
 
-  const el = createTileElement(tile, index);
+  // Shuffle the names only
+  shuffle(remainingNames);
 
-  // Convert tile coords to pixels (overlapping)
-  const left = pos.x * 70 - pos.z * 8;
-  const top = pos.y * 100 - pos.z * 8;
+  // Put shuffled names back onto the same tile indices
+  remainingIndices.forEach((tileIndex, k) => {
+    tiles[tileIndex].name = remainingNames[k];
+  });
 
-  el.style.left = left + "px";
-  el.style.top = top + "px";
-  el.style.zIndex = pos.z * 10;
-
-  board.appendChild(el);
-});
-
-// Reassign data-index to match the new tile order
-const els = document.querySelectorAll(".tile");
-els.forEach((el, i) => {
-  el.dataset.index = i;
-});
-
-
+  // Update DOM tile faces for those tiles
+  remainingIndices.forEach(tileIndex => {
+    const tile = tiles[tileIndex];
+    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
+    if (el) {
+      el.style.backgroundImage = `url('png/${tile.name}')`;
+    }
+  });
 
   updateBlockedStates();
 }
+
 function findHintPair() {
   const playable = tiles
     .map((t, i) => ({ tile: t, index: i }))
