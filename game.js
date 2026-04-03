@@ -25,7 +25,10 @@ const tileNames = [
   "bamboo-3.png",
   "char-1.png",
   "char-2.png",
-  "char-3.png"
+  "char-3.png",
+  "char-4.png",
+  "char-5.png",
+  "char-6.png"
 ];
 
 // ------------------------------
