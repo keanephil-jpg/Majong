@@ -6,9 +6,9 @@ const tileNames = [
   "bamboo-1.png",
   "bamboo-2.png",
   "bamboo-3.png",
-  "character-1.png",
-  "character-2.png",
-  "character-3.png"
+  "char-1.png",
+  "char-2.png",
+  "char-3.png"
 ];
 
 // We’ll make pairs of each tile
