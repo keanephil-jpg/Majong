@@ -30,23 +30,30 @@ button {
 }
 
 #board {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(40px, 1fr));
-  gap: 4px;
-  justify-items: center;
+  position: relative;
+  width: 900px;
+  height: 600px;
+  margin: 0 auto;
 }
 
 .tile {
-  width: 100%;
-  max-width: 70px;
+  position: absolute;
+  width: 70px;
+  height: 100px;
   cursor: pointer;
-  border-radius: 4px;
-  box-sizing: border-box;
+  transition: transform 0.1s ease;
 }
 
 .tile.selected {
   outline: 3px solid #ffcc00;
+  transform: translateY(-5px);
 }
+
+.tile.blocked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 
 #status {
   margin-top: 12px;
