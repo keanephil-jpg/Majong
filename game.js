@@ -40,7 +40,9 @@ function shuffle(array) {
   }
 }
 
-function setupBoard() {
+async function setupBoard() {
+  await loadLayout();
+
   const board = document.getElementById("board");
   const status = document.getElementById("status");
   board.innerHTML = "";
@@ -55,13 +57,29 @@ function setupBoard() {
 
   shuffle(tiles);
 
-  tiles.forEach((tile, index) => {
+  // Place tiles according to layout
+  layout.forEach((pos, index) => {
+    const tile = tiles[index];
+    tile.x = pos.x;
+    tile.y = pos.y;
+    tile.z = pos.z;
+
     const el = createTileElement(tile, index);
+
+    // Convert tile coords to pixels
+    const left = pos.x * 60 - pos.z * 5;
+    const top = pos.y * 80 - pos.z * 5;
+
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.zIndex = pos.z * 10;
+
     board.appendChild(el);
   });
 
-  firstSelected = null;
+  updateBlockedStates();
 }
+
 
 function onTileClick(e) {
   const index = parseInt(e.currentTarget.dataset.index, 10);
