@@ -77,8 +77,11 @@ async function setupBoard() {
   // Build pairs
   tiles = [];
   tileNames.forEach(name => {
-    tiles.push({ name, matched: false });
-    tiles.push({ name, matched: false });
+ // Standard Mahjong: 4 copies of each tile
+for (let i = 0; i < 4; i++) {
+  tiles.push({ name, matched: false });
+}
+
   });
 
   shuffle(tiles);
