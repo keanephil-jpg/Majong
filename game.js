@@ -96,8 +96,9 @@ for (let i = 0; i < 4; i++) {
     const el = createTileElement(tile, index);
 
     // Convert tile coords to pixels (overlapping)
-    const left = pos.x * 60 - pos.z * 5;
-    const top = pos.y * 80 - pos.z * 5;
+    const left = pos.x * 70 - pos.z * 8;
+const top = pos.y * 100 - pos.z * 8;
+
 
     el.style.left = left + "px";
     el.style.top = top + "px";
