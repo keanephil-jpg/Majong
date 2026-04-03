@@ -106,6 +106,12 @@ const top = pos.y * 100 - pos.z * 8;
 
     board.appendChild(el);
   });
+  // Reassign data-index to match the new tile order
+const els = document.querySelectorAll(".tile");
+els.forEach((el, i) => {
+  el.dataset.index = i;
+});
+
 
   updateBlockedStates();
 }
