@@ -271,4 +271,5 @@ function onTileClick(e) {
 document.addEventListener("DOMContentLoaded", () => {
   setupBoard();
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
+  document.getElementById("hint-btn").addEventListener("click", showHint);
 });
