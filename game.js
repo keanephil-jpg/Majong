@@ -1,3 +1,11 @@
+let layout = [];
+let tiles = [];
+let firstSelected = null;
+
+async function loadLayout() {
+  const response = await fetch("layout-turtle.json");
+  layout = await response.json();
+}
 // List of tile image filenames (must exist in png/)
 const tileNames = [
   "dot-1.png",
