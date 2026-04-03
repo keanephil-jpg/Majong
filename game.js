@@ -301,4 +301,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBoard();
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
   document.getElementById("hint-btn").addEventListener("click", showHint);
+  document.getElementById("shuffle-btn").addEventListener("click", shuffleTiles);
+
 });
