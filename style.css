@@ -38,21 +38,26 @@ button {
 
 .tile {
   position: absolute;
-  width: 70px;
-  height: 100px;
+  width: 90px;
+  height: 128px;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+  border-radius: 6px;
+  background-color: white;
 }
 
 .tile.selected {
   outline: 3px solid #ffcc00;
-  transform: translateY(-5px);
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.45);
 }
 
 .tile.blocked {
-  opacity: 0.4;
+  opacity: 0.45;
   pointer-events: none;
 }
+
 
 
 #status {
