@@ -409,6 +409,7 @@ if (tilesMatch(firstSelected.tile, tile)) {
       status.textContent = "No match. Try again.";
     }, 400);
 }
+}
 
 // ------------------------------
 // INITIALISE
