@@ -259,18 +259,19 @@ function shuffleTiles() {
 // BLOCKING LOGIC (pixel-accurate)
 // ------------------------------
 function updateBlockedStates() {
-  const TILE_WIDTH = 80;
-  const TILE_HEIGHT = 100;
-  const Z_OFFSET_X = 10;
-  const Z_OFFSET_Y = -10;
+  const TILE_WIDTH = 90;
+  const TILE_HEIGHT = 128;
+  const TILE_SPACING_X = 70;
+  const TILE_SPACING_Y = 100;
+  const Z_OFFSET_X = -8;
+  const Z_OFFSET_Y = -8;
 
-  const board = document.getElementById("board");
-  const els = board.querySelectorAll(".tile");
+  const els = document.querySelectorAll(".tile");
 
-  // Compute pixel rectangle for a tile
   function getRect(t) {
-    const left = t.x * TILE_WIDTH + t.z * Z_OFFSET_X;
-    const top = t.y * TILE_HEIGHT + t.z * Z_OFFSET_Y;
+    const left = t.x * TILE_SPACING_X + t.z * Z_OFFSET_X;
+    const top  = t.y * TILE_SPACING_Y + t.z * Z_OFFSET_Y;
+
     return {
       left,
       top,
@@ -279,18 +280,18 @@ function updateBlockedStates() {
     };
   }
 
-  // Rectangle overlap test
   function overlaps(a, b) {
-    return !(a.right <= b.left ||
-             a.left >= b.right ||
-             a.bottom <= b.top ||
-             a.top >= b.bottom);
+    return !(
+      a.right <= b.left ||
+      a.left >= b.right ||
+      a.bottom <= b.top ||
+      a.top >= b.bottom
+    );
   }
 
   els.forEach((el, index) => {
     const tile = tiles[index];
 
-    // Matched tiles are always blocked (hidden)
     if (tile.matched) {
       el.classList.add("blocked");
       return;
@@ -298,33 +299,31 @@ function updateBlockedStates() {
 
     const rect = getRect(tile);
 
-    // 1. Check if any tile overlaps from above (z+1)
+    // Check for tile directly above
     const hasAbove = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
       if (t.z !== tile.z + 1) return false;
       return overlaps(rect, getRect(t));
     });
 
-    // 2. Check left side
+    // Check left side
     const leftBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
       if (t.z !== tile.z) return false;
 
       const r = getRect(t);
-
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
       const touchesLeft = r.right > rect.left - 5 && r.right <= rect.left + 20;
 
       return verticalOverlap && touchesLeft;
     });
 
-    // 3. Check right side
+    // Check right side
     const rightBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
       if (t.z !== tile.z) return false;
 
       const r = getRect(t);
-
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
       const touchesRight = r.left < rect.right + 5 && r.left >= rect.right - 20;
 
