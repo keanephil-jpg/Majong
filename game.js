@@ -107,6 +107,33 @@ async function setupBoard() {
 
   updateBlockedStates();
 }
+function deepShuffleAllTiles() {
+  // Collect all unmatched tile indices
+  const remainingIndices = tiles
+    .map((t, i) => (!t.matched ? i : null))
+    .filter(i => i !== null);
+
+  // Extract their names
+  const names = remainingIndices.map(i => tiles[i].name);
+
+  // Shuffle all names
+  shuffle(names);
+
+  // Put shuffled names back
+  remainingIndices.forEach((tileIndex, k) => {
+    tiles[tileIndex].name = names[k];
+  });
+
+  // Update DOM images
+  remainingIndices.forEach(tileIndex => {
+    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
+    if (el) {
+      el.src = "png/" + tiles[tileIndex].name;
+    }
+  });
+
+  updateBlockedStates();
+}
 
 // ------------------------------
 // HINT LOGIC
@@ -132,14 +159,32 @@ function findHintPair() {
 }
 
 function showHint() {
-  const pair = findHintPair();
   const status = document.getElementById("status");
 
+  let pair = findHintPair();
+
+  // If no moves remain, auto-shuffle ALL tiles
   if (!pair) {
-    status.textContent = "No moves available.";
-    return;
+    status.textContent = "No moves available. Shuffling...";
+
+    deepShuffleAllTiles();
+    pair = findHintPair();
+
+    // If still no moves (extremely rare), shuffle again
+    if (!pair) {
+      deepShuffleAllTiles();
+      pair = findHintPair();
+    }
+
+    if (!pair) {
+      status.textContent = "Still no moves. Try again.";
+      return;
+    }
+
+    status.textContent = "New moves available!";
   }
 
+  // Show the hint
   const [i1, i2] = pair;
 
   const el1 = document.querySelector(`.tile[data-index="${i1}"]`);
@@ -147,8 +192,6 @@ function showHint() {
 
   el1.classList.add("selected");
   el2.classList.add("selected");
-
-  status.textContent = "Hint shown.";
 
   setTimeout(() => {
     el1.classList.remove("selected");
