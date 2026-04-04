@@ -424,4 +424,4 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("shuffle-btn").addEventListener("click", () => {
     shuffleTiles();
 });
-
+});
