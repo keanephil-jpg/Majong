@@ -141,7 +141,12 @@ function deepShuffleAllTiles() {
 function findHintPair() {
   const playable = tiles
     .map((t, i) => ({ tile: t, index: i }))
-    .filter(obj => !obj.tile.matched)
+   .filter(obj => {
+  const name = obj.tile.name;
+  if (name.startsWith("flower") || name.startsWith("season")) return false;
+  return !obj.tile.matched;
+})
+
     .filter(obj => {
       const el = document.querySelector(`.tile[data-index="${obj.index}"]`);
       return el && !el.classList.contains("blocked");
@@ -149,7 +154,8 @@ function findHintPair() {
 
   for (let i = 0; i < playable.length; i++) {
     for (let j = i + 1; j < playable.length; j++) {
-      if (playable[i].tile.name === playable[j].tile.name) {
+      if (tilesMatch(playable[i].tile, playable[j].tile))
+ {
         return [playable[i].index, playable[j].index];
       }
     }
@@ -293,6 +299,12 @@ function updateBlockedStates() {
     }
   });
 }
+function tilesMatch(a, b) {
+  if (a.name === b.name) return true;
+  if (a.name.startsWith("flower") && b.name.startsWith("flower")) return true;
+  if (a.name.startsWith("season") && b.name.startsWith("season")) return true;
+  return false;
+}
 
 // ------------------------------
 // TILE CLICK HANDLER
@@ -325,10 +337,12 @@ function onTileClick(e) {
   }
 
   // Second selection
-  thisEl.classList.add("selected");
+thisEl.classList.add("selected");
 
-  if (firstSelected.tile.name === tile.name) {
-    // Match
+// Check for match using proper Mahjong rules
+if (tilesMatch(firstSelected.tile, tile)) {
+
+    // MATCH
     tiles[firstSelected.index].matched = true;
     tiles[index].matched = true;
 
@@ -347,8 +361,9 @@ function onTileClick(e) {
       updateBlockedStates();
     }, 200);
 
-  } else {
-    // No match
+} else {
+
+    // NO MATCH
     setTimeout(() => {
       const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
       el1.classList.remove("selected");
@@ -357,9 +372,7 @@ function onTileClick(e) {
       firstSelected = null;
       status.textContent = "No match. Try again.";
     }, 400);
-  }
 }
-
 
 // ------------------------------
 // INITIALISE
