@@ -254,41 +254,83 @@ function shuffleTiles() {
 // ------------------------------
 // BLOCKING LOGIC
 // ------------------------------
+// ------------------------------
+// BLOCKING LOGIC (pixel-accurate)
+// ------------------------------
 function updateBlockedStates() {
+  const TILE_WIDTH = 80;
+  const TILE_HEIGHT = 100;
+  const Z_OFFSET_X = 10;
+  const Z_OFFSET_Y = -10;
+
   const board = document.getElementById("board");
   const els = board.querySelectorAll(".tile");
 
+  // Helper: compute pixel rectangle of a tile
+  function getRect(t) {
+    const left = t.x * TILE_WIDTH + t.z * Z_OFFSET_X;
+    const top = t.y * TILE_HEIGHT + t.z * Z_OFFSET_Y;
+    return {
+      left,
+      top,
+      right: left + TILE_WIDTH,
+      bottom: top + TILE_HEIGHT
+    };
+  }
+
+  // Helper: check rectangle overlap
+  function overlaps(a, b) {
+    return !(a.right <= b.left ||
+             a.left >= b.right ||
+             a.bottom <= b.top ||
+             a.top >= b.bottom);
+  }
+
   els.forEach((el, index) => {
     const tile = tiles[index];
+
+    // Matched tiles are always blocked (hidden)
     if (tile.matched) {
       el.classList.add("blocked");
       return;
     }
 
-    const { x, y, z } = tile;
+    const rect = getRect(tile);
 
-    // Check if a tile is on top
-    const hasAbove = tiles.some(t =>
-      !t.matched &&
-      t.z === z + 1 &&
-      Math.abs(t.x - x) <= 1 &&
-      Math.abs(t.y - y) <= 1
-    );
+    // 1. Check if ANY tile overlaps from above (z+1)
+    const hasAbove = tiles.some((t, i) => {
+      if (i === index || t.matched) return false;
+      if (t.z !== tile.z + 1) return false;
+      return overlaps(rect, getRect(t));
+    });
 
-    // Check left and right
-    const leftBlocked = tiles.some(t =>
-      !t.matched &&
-      t.z === z &&
-      t.y === y &&
-      t.x === x - 2
-    );
+    // 2. Check left side
+    const leftBlocked = tiles.some((t, i) => {
+      if (i === index || t.matched) return false;
+      if (t.z !== tile.z) return false;
 
-    const rightBlocked = tiles.some(t =>
-      !t.matched &&
-      t.z === z &&
-      t.y === y &&
-      t.x === x + 2
-    );
+      const r = getRect(t);
+
+      // Tile is blocking left side if it overlaps vertically
+      // AND its right edge touches or crosses our left edge
+      const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
+      const touchesLeft = r.right > rect.left - 5 && r.right <= rect.left + 20;
+
+      return verticalOverlap && touchesLeft;
+    });
+
+    // 3. Check right side
+    const rightBlocked = tiles.some((t, i) => {
+      if (i === index || t.matched) return false;
+      if (t.z !== tile.z) return false;
+
+      const r = getRect(t);
+
+      const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
+      const touchesRight = r.left < rect.right + 5 && r.left >= rect.right - 20;
+
+      return verticalOverlap && touchesRight;
+    });
 
     const blocked = hasAbove || (leftBlocked && rightBlocked);
 
@@ -298,12 +340,6 @@ function updateBlockedStates() {
       el.classList.remove("blocked");
     }
   });
-}
-function tilesMatch(a, b) {
-  if (a.name === b.name) return true;
-  if (a.name.startsWith("flower") && b.name.startsWith("flower")) return true;
-  if (a.name.startsWith("season") && b.name.startsWith("season")) return true;
-  return false;
 }
 
 // ------------------------------
