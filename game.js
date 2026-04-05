@@ -307,11 +307,7 @@ function deepShuffleAllTiles() {
     if (el) el.src = "png/" + tiles[tileIndex].name;
   });
 
-  updateBlockedStates();
-}
-
-
-// ------------------------------
+ // ------------------------------
 // SMART HINT ENGINE (solver-aware)
 // ------------------------------
 function findSmartHintPair() {
