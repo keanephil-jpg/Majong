@@ -567,5 +567,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("hint-btn").addEventListener("click", showHint);
   document.getElementById("shuffle-btn").addEventListener("click", () => {
     shuffleUntilSolvable();
+  });
 });
 
