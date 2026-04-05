@@ -310,13 +310,6 @@ function deepShuffleAllTiles() {
   updateBlockedStates();
 }
 
-// ------------------------------
-// SMART HINT ENGINE (solver-aware)
-// ------------------------------
-function findSmartHintPair() {
-  // ... (rest of your function as you pasted)
-
-
  // ------------------------------
 // SMART HINT ENGINE (solver-aware)
 // ------------------------------
