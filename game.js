@@ -315,13 +315,10 @@ function deepShuffleAllTiles() {
 // SMART HINT ENGINE (solver-aware)
 // ------------------------------
 function findSmartHintPair() {
-  // Work on a cloned board so we don't touch live state
   const board = cloneBoard(tiles);
 
-  // Get all free tiles in data space
   let freeTiles = getFreeTiles(board);
 
-  // Optional: exclude flowers/seasons from hints (your original behaviour)
   freeTiles = freeTiles.filter(t => {
     const name = t.name;
     if (isFlower(name) || isSeason(name)) return false;
@@ -331,11 +328,9 @@ function findSmartHintPair() {
   const pairs = getMatchingPairs(freeTiles);
   if (pairs.length === 0) return null;
 
-  // Try each pair and see if taking it keeps the board solvable
   for (const pair of pairs) {
     const nextBoard = simulateMove(board, pair);
     if (isSolvable(nextBoard)) {
-      // Map back from cloned tiles (by id) to live tile indices
       const id1 = pair[0].id;
       const id2 = pair[1].id;
 
@@ -348,7 +343,6 @@ function findSmartHintPair() {
     }
   }
 
-  // Fallback: if no "safe" pair found, return any legal pair
   const fallback = pairs[0];
   if (fallback) {
     const id1 = fallback[0].id;
@@ -365,6 +359,7 @@ function findSmartHintPair() {
   return null;
 }
 
+
 function showHint() {
   const status = document.getElementById("status");
 
@@ -374,10 +369,12 @@ function showHint() {
   if (!pair) {
     status.textContent = "No moves available. Shuffling...";
     deepShuffleAllTiles();
-    pair = findHintPair();
+    pair = findSmartHintPair();
+
     if (!pair) {
       deepShuffleAllTiles();
-      pair = findHintPair();
+      pair = findSmartHintPair();
+
     }
     if (!pair) {
       status.textContent = "Still no moves. Try again.";
