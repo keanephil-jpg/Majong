@@ -219,6 +219,28 @@ function isSolvable(board, depth = 0, maxDepth = 5000) {
 function isCurrentLayoutSolvable() {
   return isSolvable(cloneBoard(tiles));
 }
+// ------------------------------
+// SOLVABLE SHUFFLE
+// ------------------------------
+async function shuffleUntilSolvable(maxAttempts = 200) {
+  const status = document.getElementById("status");
+  status.textContent = "Shuffling for a solvable layout...";
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+
+    // Shuffle all unmatched tiles
+    deepShuffleAllTiles();
+
+    // Check solvability
+    if (isCurrentLayoutSolvable()) {
+      status.textContent = "Solvable layout found!";
+      return true;
+    }
+  }
+
+  status.textContent = "Could not find a solvable shuffle.";
+  return false;
+}
 
 // ------------------------------
 // SET UP BOARD
@@ -517,5 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBoard();
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
   document.getElementById("hint-btn").addEventListener("click", showHint);
-  document.getElementById("shuffle-btn").addEventListener("click", shuffleTiles);
+  document.getElementById("shuffle-btn").addEventListener("click", () => {
+    shuffleUntilSolvable();
 });
+
