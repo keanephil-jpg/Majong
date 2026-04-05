@@ -310,10 +310,60 @@ function deepShuffleAllTiles() {
   updateBlockedStates();
 }
 
+
 // ------------------------------
-// HINT LOGIC
+// SMART HINT ENGINE (solver-aware)
 // ------------------------------
-“Next: smart hint engine.”
+function findSmartHintPair() {
+  // Work on a cloned board so we don't touch live state
+  const board = cloneBoard(tiles);
+
+  // Get all free tiles in data space
+  let freeTiles = getFreeTiles(board);
+
+  // Optional: exclude flowers/seasons from hints (your original behaviour)
+  freeTiles = freeTiles.filter(t => {
+    const name = t.name;
+    if (isFlower(name) || isSeason(name)) return false;
+    return true;
+  });
+
+  const pairs = getMatchingPairs(freeTiles);
+  if (pairs.length === 0) return null;
+
+  // Try each pair and see if taking it keeps the board solvable
+  for (const pair of pairs) {
+    const nextBoard = simulateMove(board, pair);
+    if (isSolvable(nextBoard)) {
+      // Map back from cloned tiles (by id) to live tile indices
+      const id1 = pair[0].id;
+      const id2 = pair[1].id;
+
+      const idx1 = tiles.findIndex(t => t.id === id1 && !t.matched);
+      const idx2 = tiles.findIndex(t => t.id === id2 && !t.matched);
+
+      if (idx1 !== -1 && idx2 !== -1) {
+        return [idx1, idx2];
+      }
+    }
+  }
+
+  // Fallback: if no "safe" pair found, return any legal pair
+  const fallback = pairs[0];
+  if (fallback) {
+    const id1 = fallback[0].id;
+    const id2 = fallback[1].id;
+
+    const idx1 = tiles.findIndex(t => t.id === id1 && !t.matched);
+    const idx2 = tiles.findIndex(t => t.id === id2 && !t.matched);
+
+    if (idx1 !== -1 && idx2 !== -1) {
+      return [idx1, idx2];
+    }
+  }
+
+  return null;
+}
 
 function showHint() {
   const status = document.getElementById("status");
