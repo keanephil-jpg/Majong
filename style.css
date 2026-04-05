@@ -51,8 +51,9 @@ button {
   outline: 3px solid #ffcc00;
   transform: translateY(-10px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.45);
-  .tile.selected {z-index: 9999;
+  z-index: 9999;
 }
+
 
 .tile.blocked {
   opacity: 0.45;
