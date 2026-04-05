@@ -14,6 +14,8 @@ const TILE_SPACING_X = 70;
 const TILE_SPACING_Y = 100;
 const Z_OFFSET_X = -8;
 const Z_OFFSET_Y = -8;
+
+// Shrink collision box to ignore transparent PNG padding
 const COLLISION_MARGIN_X = 10;
 const COLLISION_MARGIN_Y = 14;
 
@@ -44,10 +46,10 @@ const tileNames = [
   // Dragons
   "dragon-red.png","dragon-green.png","dragon-white.png",
 
-  // Flowers (singletons)
+  // Flowers
   "flower-1.png","flower-2.png","flower-3.png","flower-4.png",
 
-  // Seasons (singletons)
+  // Seasons
   "season-1.png","season-2.png","season-3.png","season-4.png"
 ];
 
@@ -85,7 +87,6 @@ function isSeason(name) {
   return name.startsWith("season-");
 }
 
-// Unified matching: flowers with flowers, seasons with seasons, others strict
 function tilesMatch(a, b) {
   const av = a.name;
   const bv = b.name;
@@ -99,8 +100,6 @@ function tilesMatch(a, b) {
 // ------------------------------
 // SOLVABILITY ENGINE (DATA-ONLY)
 // ------------------------------
-
-// Clone board (data only, no DOM elements needed)
 function cloneBoard(board) {
   return board.map(t => ({
     id: t.id,
@@ -108,7 +107,7 @@ function cloneBoard(board) {
     y: t.y,
     z: t.z,
     name: t.name,
-    removed: t.matched === true
+    removed: t.matched
   }));
 }
 
@@ -133,13 +132,11 @@ function overlapsRect(a, b) {
   );
 }
 
-// Pure data-based "is tile free" for solver
 function isTileFreeData(board, tile) {
   if (tile.removed) return false;
 
   const rect = getRectData(tile);
 
-  // Check for tile directly above
   const hasAbove = board.some(t => {
     if (t.id === tile.id || t.removed) return false;
     if (t.z !== tile.z + 1) return false;
@@ -148,7 +145,6 @@ function isTileFreeData(board, tile) {
 
   if (hasAbove) return false;
 
-  // Check left side
   const leftBlocked = board.some(t => {
     if (t.id === tile.id || t.removed) return false;
     if (t.z !== tile.z) return false;
@@ -160,7 +156,6 @@ function isTileFreeData(board, tile) {
     return verticalOverlap && touchesLeft;
   });
 
-  // Check right side
   const rightBlocked = board.some(t => {
     if (t.id === tile.id || t.removed) return false;
     if (t.z !== tile.z) return false;
@@ -175,12 +170,10 @@ function isTileFreeData(board, tile) {
   return !(leftBlocked && rightBlocked);
 }
 
-// Get all free tiles in this board state
 function getFreeTiles(board) {
   return board.filter(t => !t.removed && isTileFreeData(board, t));
 }
 
-// Get all matching pairs among free tiles
 function getMatchingPairs(freeTiles) {
   const pairs = [];
   for (let i = 0; i < freeTiles.length; i++) {
@@ -193,27 +186,21 @@ function getMatchingPairs(freeTiles) {
   return pairs;
 }
 
-// Simulate removing a pair and return new board state
 function simulateMove(board, pair) {
   const newBoard = cloneBoard(board);
-  const idsToRemove = new Set([pair[0].id, pair[1].id]);
-  for (let t of newBoard) {
-    if (idsToRemove.has(t.id)) {
-      t.removed = true;
-    }
-  }
+  const ids = new Set([pair[0].id, pair[1].id]);
+  newBoard.forEach(t => {
+    if (ids.has(t.id)) t.removed = true;
+  });
   return newBoard;
 }
 
-// Check if all tiles are removed
 function allTilesRemoved(board) {
   return board.every(t => t.removed);
 }
 
-// Recursive solver
 function isSolvable(board, depth = 0, maxDepth = 5000) {
   if (depth > maxDepth) return false;
-
   if (allTilesRemoved(board)) return true;
 
   const freeTiles = getFreeTiles(board);
@@ -223,18 +210,14 @@ function isSolvable(board, depth = 0, maxDepth = 5000) {
 
   for (const pair of pairs) {
     const nextBoard = simulateMove(board, pair);
-    if (isSolvable(nextBoard, depth + 1, maxDepth)) {
-      return true;
-    }
+    if (isSolvable(nextBoard, depth + 1, maxDepth)) return true;
   }
 
   return false;
 }
 
-// Convenience: check if current live tiles array is solvable
 function isCurrentLayoutSolvable() {
-  const boardCopy = cloneBoard(tiles);
-  return isSolvable(boardCopy);
+  return isSolvable(cloneBoard(tiles));
 }
 
 // ------------------------------
@@ -248,7 +231,6 @@ async function setupBoard() {
   board.innerHTML = "";
   status.textContent = "";
 
-  // Build tiles: 4 copies of each tile
   tiles = [];
   tileNames.forEach(name => {
     for (let i = 0; i < 4; i++) {
@@ -263,10 +245,8 @@ async function setupBoard() {
     }
   });
 
-  // Shuffle initial tiles
   shuffle(tiles);
 
-  // Place tiles according to layout
   layout.forEach((pos, index) => {
     const tile = tiles[index];
     tile.x = pos.x;
@@ -289,26 +269,20 @@ async function setupBoard() {
 }
 
 // ------------------------------
-// DEEP SHUFFLE (ALL UNMATCHED TILES)
+// DEEP SHUFFLE (ALL UNMATCHED)
 // ------------------------------
 function deepShuffleAllTiles() {
-  const remainingIndices = tiles
+  const remaining = tiles
     .map((t, i) => (!t.matched ? i : null))
     .filter(i => i !== null);
 
-  const names = remainingIndices.map(i => tiles[i].name);
-
+  const names = remaining.map(i => tiles[i].name);
   shuffle(names);
 
-  remainingIndices.forEach((tileIndex, k) => {
+  remaining.forEach((tileIndex, k) => {
     tiles[tileIndex].name = names[k];
-  });
-
-  remainingIndices.forEach(tileIndex => {
     const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
-    if (el) {
-      el.src = "png/" + tiles[tileIndex].name;
-    }
+    if (el) el.src = "png/" + tiles[tileIndex].name;
   });
 
   updateBlockedStates();
@@ -322,7 +296,7 @@ function findHintPair() {
     .map((t, i) => ({ tile: t, index: i }))
     .filter(obj => {
       const name = obj.tile.name;
-      if (name.startsWith("flower") || name.startsWith("season")) return false;
+      if (isFlower(name) || isSeason(name)) return false;
       return !obj.tile.matched;
     })
     .filter(obj => {
@@ -348,20 +322,16 @@ function showHint() {
 
   if (!pair) {
     status.textContent = "No moves available. Shuffling...";
-
     deepShuffleAllTiles();
     pair = findHintPair();
-
     if (!pair) {
       deepShuffleAllTiles();
       pair = findHintPair();
     }
-
     if (!pair) {
       status.textContent = "Still no moves. Try again.";
       return;
     }
-
     status.textContent = "New moves available!";
   }
 
@@ -381,7 +351,7 @@ function showHint() {
 }
 
 // ------------------------------
-// SHUFFLE TILES (NAMES-ONLY, FREE TILES)
+// SHUFFLE FREE TILES ONLY
 // ------------------------------
 function shuffleTiles() {
   const freeIndices = tiles
@@ -396,26 +366,19 @@ function shuffleTiles() {
   if (freeIndices.length < 2) return;
 
   const freeNames = freeIndices.map(i => tiles[i].name);
-
   shuffle(freeNames);
 
   freeIndices.forEach((tileIndex, k) => {
     tiles[tileIndex].name = freeNames[k];
-  });
-
-  freeIndices.forEach(tileIndex => {
-    const tile = tiles[tileIndex];
     const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
-    if (el) {
-      el.src = "png/" + tile.name;
-    }
+    if (el) el.src = "png/" + tiles[tileIndex].name;
   });
 
   updateBlockedStates();
 }
 
 // ------------------------------
-// BLOCKING LOGIC (pixel-accurate with margins)
+// BLOCKING LOGIC (pixel-accurate)
 // ------------------------------
 function updateBlockedStates() {
   const els = document.querySelectorAll(".tile");
@@ -553,10 +516,6 @@ function onTileClick(e) {
 document.addEventListener("DOMContentLoaded", () => {
   setupBoard();
   document.getElementById("restart-btn").addEventListener("click", setupBoard);
-  document.getElementById("hint-btn").addEventListener("click", () => {
-    showHint();
-  });
-  document.getElementById("shuffle-btn").addEventListener("click", () => {
-    shuffleTiles();
-  });
+  document.getElementById("hint-btn").addEventListener("click", showHint);
+  document.getElementById("shuffle-btn").addEventListener("click", shuffleTiles);
 });
