@@ -199,7 +199,12 @@ function allTilesRemoved(board) {
   return board.every(t => t.removed);
 }
 
-function isSolvable(board, depth = 0, maxDepth = 5000) {
+function isSolvable(board, depth = 0, maxDepth = 200) {
+  // TIME LIMIT ESCAPE
+  if (performance.now() - solverStartTime > 200) {
+    return false;
+  }
+
   if (depth > maxDepth) return false;
   if (allTilesRemoved(board)) return true;
 
@@ -216,9 +221,13 @@ function isSolvable(board, depth = 0, maxDepth = 5000) {
   return false;
 }
 
+let solverStartTime = 0;
+
 function isCurrentLayoutSolvable() {
-  return isSolvable(cloneBoard(tiles));
+  solverStartTime = performance.now();
+   return isSolvable(cloneBoard(tiles));
 }
+
 // ------------------------------
 // SOLVABLE SHUFFLE
 // ------------------------------
@@ -228,10 +237,27 @@ async function shuffleUntilSolvable(maxAttempts = 200) {
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 
-    // Shuffle all unmatched tiles
-    deepShuffleAllTiles();
+    // Shuffle tile positions
+    shuffle(tiles);
 
-    // Check solvability
+    // Reapply layout positions
+    layout.forEach((pos, index) => {
+      const tile = tiles[index];
+      tile.x = pos.x;
+      tile.y = pos.y;
+      tile.z = pos.z;
+
+      const el = document.querySelector(`.tile[data-index="${index}"]`);
+      if (el) {
+        el.src = "png/" + tile.name;
+        el.style.left = (pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X) + "px";
+        el.style.top  = (pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y) + "px";
+        el.style.zIndex = pos.z * 10;
+      }
+    });
+
+    updateBlockedStates();
+
     if (isCurrentLayoutSolvable()) {
       status.textContent = "Solvable layout found!";
       return true;
@@ -241,6 +267,7 @@ async function shuffleUntilSolvable(maxAttempts = 200) {
   status.textContent = "Could not find a solvable shuffle.";
   return false;
 }
+
 
 // ------------------------------
 // SET UP BOARD
