@@ -81,6 +81,115 @@ async function setupBoard() {
       tiles.push({ name, matched: false });
     }
   });
+// ---------- SOLVABILITY ENGINE ----------
+
+// Adjust these to match your actual tile value naming:
+const FLOWER_VALUES = ['flower1', 'flower2', 'flower3', 'flower4'];
+const SEASON_VALUES = ['season1', 'season2', 'season3', 'season4'];
+
+// Clone board (data only, no DOM elements needed)
+function cloneBoard(board) {
+    return board.map(t => ({
+        id: t.id,
+        x: t.x,
+        y: t.y,
+        z: t.z,
+        value: t.value,
+        removed: t.removed === true
+    }));
+}
+
+// Mahjong-correct matching: flowers with flowers, seasons with seasons, others strict
+function isMahjongMatch(a, b) {
+    if (a.removed || b.removed) return false;
+
+    const av = a.value;
+    const bv = b.value;
+
+    const aIsFlower = FLOWER_VALUES.includes(av);
+    const bIsFlower = FLOWER_VALUES.includes(bv);
+    if (aIsFlower && bIsFlower) return true;
+
+    const aIsSeason = SEASON_VALUES.includes(av);
+    const bIsSeason = SEASON_VALUES.includes(bv);
+    if (aIsSeason && bIsSeason) return true;
+
+    return av === bv;
+}
+
+// Wrapper around your existing "is tile free" logic.
+// Replace this body if your function name/signature differs.
+function isTileFreeInBoard(board, tile) {
+    // Here we assume you already have a function isTileFree(tile)
+    // that uses x, y, z, removed, etc. If it relies on global "tiles",
+    // you may need to temporarily set a global reference or adapt it.
+    return isTileFree(tile);
+}
+
+// Get all free tiles in this board state
+function getFreeTiles(board) {
+    return board.filter(t => !t.removed && isTileFreeInBoard(board, t));
+}
+
+// Get all matching pairs among free tiles
+function getMatchingPairs(freeTiles) {
+    const pairs = [];
+    for (let i = 0; i < freeTiles.length; i++) {
+        for (let j = i + 1; j < freeTiles.length; j++) {
+            if (isMahjongMatch(freeTiles[i], freeTiles[j])) {
+                pairs.push([freeTiles[i], freeTiles[j]]);
+            }
+        }
+    }
+    return pairs;
+}
+
+// Simulate removing a pair and return new board state
+function simulateMove(board, pair) {
+    const newBoard = cloneBoard(board);
+    const idsToRemove = new Set([pair[0].id, pair[1].id]);
+    for (let t of newBoard) {
+        if (idsToRemove.has(t.id)) {
+            t.removed = true;
+        }
+    }
+    return newBoard;
+}
+
+// Check if all tiles are removed
+function allTilesRemoved(board) {
+    return board.every(t => t.removed);
+}
+
+// Recursive solver
+function isSolvable(board, depth = 0, maxDepth = 5000) {
+    // Safety guard to avoid infinite recursion in weird cases
+    if (depth > maxDepth) return false;
+
+    if (allTilesRemoved(board)) return true;
+
+    const freeTiles = getFreeTiles(board);
+    const pairs = getMatchingPairs(freeTiles);
+
+    if (pairs.length === 0) return false;
+
+    for (const pair of pairs) {
+        const nextBoard = simulateMove(board, pair);
+        if (isSolvable(nextBoard, depth + 1, maxDepth)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Convenience: check if current live tiles array is solvable
+function isCurrentLayoutSolvable() {
+    const boardCopy = cloneBoard(tiles); // assumes your main array is called "tiles"
+    return isSolvable(boardCopy);
+}
+
+// ---------- END SOLVABILITY ENGINE ----------
 
   // Shuffle initial tiles
   shuffle(tiles);
