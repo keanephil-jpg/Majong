@@ -313,34 +313,13 @@ function deepShuffleAllTiles() {
 // ------------------------------
 // HINT LOGIC
 // ------------------------------
-function findHintPair() {
-  const playable = tiles
-    .map((t, i) => ({ tile: t, index: i }))
-    .filter(obj => {
-      const name = obj.tile.name;
-      if (isFlower(name) || isSeason(name)) return false;
-      return !obj.tile.matched;
-    })
-    .filter(obj => {
-      const el = document.querySelector(`.tile[data-index="${obj.index}"]`);
-      return el && !el.classList.contains("blocked");
-    });
-
-  for (let i = 0; i < playable.length; i++) {
-    for (let j = i + 1; j < playable.length; j++) {
-      if (tilesMatch(playable[i].tile, playable[j].tile)) {
-        return [playable[i].index, playable[j].index];
-      }
-    }
-  }
-
-  return null;
-}
+“Next: smart hint engine.”
 
 function showHint() {
   const status = document.getElementById("status");
 
-  let pair = findHintPair();
+ let pair = findSmartHintPair();
+
 
   if (!pair) {
     status.textContent = "No moves available. Shuffling...";
