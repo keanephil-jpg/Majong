@@ -237,23 +237,32 @@ async function shuffleUntilSolvable(maxAttempts = 200) {
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 
-    // Shuffle tile positions
+    // Shuffle tile objects
     shuffle(tiles);
 
-    // Reapply layout positions
+    // Apply layout positions
     layout.forEach((pos, index) => {
       const tile = tiles[index];
       tile.x = pos.x;
       tile.y = pos.y;
       tile.z = pos.z;
+    });
 
-      const el = document.querySelector(`.tile[data-index="${index}"]`);
-      if (el) {
-        el.src = "png/" + tile.name;
-        el.style.left = (pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X) + "px";
-        el.style.top  = (pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y) + "px";
-        el.style.zIndex = pos.z * 10;
-      }
+    // Rebuild the board DOM
+    const board = document.getElementById("board");
+    board.innerHTML = "";
+
+    tiles.forEach((tile, index) => {
+      const el = createTileElement(tile, index);
+
+      const left = tile.x * TILE_SPACING_X + tile.z * Z_OFFSET_X;
+      const top  = tile.y * TILE_SPACING_Y + tile.z * Z_OFFSET_Y;
+
+      el.style.left = left + "px";
+      el.style.top = top + "px";
+      el.style.zIndex = tile.z * 10;
+
+      board.appendChild(el);
     });
 
     updateBlockedStates();
