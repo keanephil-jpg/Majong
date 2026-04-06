@@ -1,39 +1,60 @@
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0b1724;
-  color: #f5f5f5;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #2b3b5f 0%, #0b1220 40%, #020617 100%);
+  color: #f9fafb;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  min-height: 100vh;
 }
 
-#game-container {
-  max-width: 900px;
+/* Game wrapper with subtle panel effect */
+#game-wrapper {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  padding: 24px 32px 32px;
+  max-width: 1100px;
   width: 100%;
-  padding: 16px;
+  box-sizing: border-box;
 }
 
-h1 {
+/* Center title and controls */
+#game-wrapper h1 {
   text-align: center;
-  margin-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 #controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+#status {
   text-align: center;
-  margin-bottom: 12px;
+  min-height: 20px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #e5e7eb;
 }
 
-button {
-  padding: 8px 16px;
-  font-size: 16px;
-}
-
+/* Board area sits on a soft panel */
 #board {
   position: relative;
-  width: 900px;
-  height: 600px;
   margin: 0 auto;
+  width: 900px;   /* adjust if needed */
+  height: 600px;  /* adjust if needed */
+  background: radial-gradient(circle at top, #1f2937 0%, #020617 70%);
+  border-radius: 12px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
 }
 
 .tile {
