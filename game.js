@@ -98,19 +98,8 @@ function tilesMatch(a, b) {
 }
 
 // ------------------------------
-// SOLVABILITY ENGINE (DATA-ONLY)
+// FREE TILE / PAIR DETECTION
 // ------------------------------
-function cloneBoard(board) {
-  return board.map(t => ({
-    id: t.id,
-    x: t.x,
-    y: t.y,
-    z: t.z,
-    name: t.name,
-    removed: t.matched
-  }));
-}
-
 function getRectData(t) {
   const left = t.x * TILE_SPACING_X + t.z * Z_OFFSET_X;
   const top  = t.y * TILE_SPACING_Y + t.z * Z_OFFSET_Y;
@@ -133,12 +122,12 @@ function overlapsRect(a, b) {
 }
 
 function isTileFreeData(board, tile) {
-  if (tile.removed) return false;
+  if (tile.matched) return false;
 
   const rect = getRectData(tile);
 
   const hasAbove = board.some(t => {
-    if (t.id === tile.id || t.removed) return false;
+    if (t.id === tile.id || t.matched) return false;
     if (t.z !== tile.z + 1) return false;
     return overlapsRect(rect, getRectData(t));
   });
@@ -146,7 +135,7 @@ function isTileFreeData(board, tile) {
   if (hasAbove) return false;
 
   const leftBlocked = board.some(t => {
-    if (t.id === tile.id || t.removed) return false;
+    if (t.id === tile.id || t.matched) return false;
     if (t.z !== tile.z) return false;
 
     const r = getRectData(t);
@@ -157,7 +146,7 @@ function isTileFreeData(board, tile) {
   });
 
   const rightBlocked = board.some(t => {
-    if (t.id === tile.id || t.removed) return false;
+    if (t.id === tile.id || t.matched) return false;
     if (t.z !== tile.z) return false;
 
     const r = getRectData(t);
@@ -171,7 +160,7 @@ function isTileFreeData(board, tile) {
 }
 
 function getFreeTiles(board) {
-  return board.filter(t => !t.removed && isTileFreeData(board, t));
+  return board.filter(t => !t.matched && isTileFreeData(board, t));
 }
 
 function getMatchingPairs(freeTiles) {
@@ -186,97 +175,11 @@ function getMatchingPairs(freeTiles) {
   return pairs;
 }
 
-function simulateMove(board, pair) {
-  const newBoard = cloneBoard(board);
-  const ids = new Set([pair[0].id, pair[1].id]);
-  newBoard.forEach(t => {
-    if (ids.has(t.id)) t.removed = true;
-  });
-  return newBoard;
+function hasAnyMoves() {
+  const free = getFreeTiles(tiles);
+  const pairs = getMatchingPairs(free);
+  return pairs.length > 0;
 }
-
-function allTilesRemoved(board) {
-  return board.every(t => t.removed);
-}
-
-function isSolvable(board, depth = 0, maxDepth = 200) {
-  // TIME LIMIT ESCAPE
-  if (performance.now() - solverStartTime > 200) {
-    return false;
-  }
-
-  if (depth > maxDepth) return false;
-  if (allTilesRemoved(board)) return true;
-
-  const freeTiles = getFreeTiles(board);
-  const pairs = getMatchingPairs(freeTiles);
-
-  if (pairs.length === 0) return false;
-
-  for (const pair of pairs) {
-    const nextBoard = simulateMove(board, pair);
-    if (isSolvable(nextBoard, depth + 1, maxDepth)) return true;
-  }
-
-  return false;
-}
-
-let solverStartTime = 0;
-
-function isCurrentLayoutSolvable() {
-  solverStartTime = performance.now();
-   return isSolvable(cloneBoard(tiles));
-}
-
-// ------------------------------
-// SOLVABLE SHUFFLE
-// ------------------------------
-async function shuffleUntilSolvable(maxAttempts = 200) {
-  const status = document.getElementById("status");
-  status.textContent = "Shuffling for a solvable layout...";
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-
-    // Shuffle tile objects
-    shuffle(tiles);
-
-    // Apply layout positions
-    layout.forEach((pos, index) => {
-      const tile = tiles[index];
-      tile.x = pos.x;
-      tile.y = pos.y;
-      tile.z = pos.z;
-    });
-
-    // Rebuild the board DOM
-    const board = document.getElementById("board");
-    board.innerHTML = "";
-
-    tiles.forEach((tile, index) => {
-      const el = createTileElement(tile, index);
-
-      const left = tile.x * TILE_SPACING_X + tile.z * Z_OFFSET_X;
-      const top  = tile.y * TILE_SPACING_Y + tile.z * Z_OFFSET_Y;
-
-      el.style.left = left + "px";
-      el.style.top = top + "px";
-      el.style.zIndex = tile.z * 10;
-
-      board.appendChild(el);
-    });
-
-    updateBlockedStates();
-
-    if (isCurrentLayoutSolvable()) {
-      status.textContent = "Solvable layout found!";
-      return true;
-    }
-  }
-
-  status.textContent = "Could not find a solvable shuffle.";
-  return false;
-}
-
 
 // ------------------------------
 // SET UP BOARD
@@ -327,137 +230,43 @@ async function setupBoard() {
 }
 
 // ------------------------------
-// DEEP SHUFFLE (ALL UNMATCHED)
+// SHUFFLE BOARD (NO SOLVER, CLEAN REBUILD)
 // ------------------------------
-function deepShuffleAllTiles() {
-  const remaining = tiles
-    .map((t, i) => (!t.matched ? i : null))
-    .filter(i => i !== null);
-
-  const names = remaining.map(i => tiles[i].name);
-  shuffle(names);
-
-  remaining.forEach((tileIndex, k) => {
-    tiles[tileIndex].name = names[k];
-    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
-    if (el) el.src = "png/" + tiles[tileIndex].name;
-  });
-
-  updateBlockedStates();
-}
-
- // ------------------------------
-// SMART HINT ENGINE (solver-aware)
-// ------------------------------
-function findSmartHintPair() {
-  const board = cloneBoard(tiles);
-
-  let freeTiles = getFreeTiles(board);
-
-  freeTiles = freeTiles.filter(t => {
-    const name = t.name;
-    if (isFlower(name) || isSeason(name)) return false;
-    return true;
-  });
-
-  const pairs = getMatchingPairs(freeTiles);
-  if (pairs.length === 0) return null;
-
-  for (const pair of pairs) {
-    const nextBoard = simulateMove(board, pair);
-    if (isSolvable(nextBoard)) {
-      const id1 = pair[0].id;
-      const id2 = pair[1].id;
-
-      const idx1 = tiles.findIndex(t => t.id === id1 && !t.matched);
-      const idx2 = tiles.findIndex(t => t.id === id2 && !t.matched);
-
-      if (idx1 !== -1 && idx2 !== -1) {
-        return [idx1, idx2];
-      }
-    }
-  }
-
-  const fallback = pairs[0];
-  if (fallback) {
-    const id1 = fallback[0].id;
-    const id2 = fallback[1].id;
-
-    const idx1 = tiles.findIndex(t => t.id === id1 && !t.matched);
-    const idx2 = tiles.findIndex(t => t.id === id2 && !t.matched);
-
-    if (idx1 !== -1 && idx2 !== -1) {
-      return [idx1, idx2];
-    }
-  }
-
-  return null;
-}
-
-
-function showHint() {
+async function shuffleUntilSolvable() {
   const status = document.getElementById("status");
+  status.textContent = "Shuffling...";
 
- let pair = findSmartHintPair();
+  // Simple: shuffle tiles and rebuild board
+  shuffle(tiles);
 
+  const board = document.getElementById("board");
+  board.innerHTML = "";
 
-  if (!pair) {
-    status.textContent = "No moves available. Shuffling...";
-    deepShuffleAllTiles();
-    pair = findSmartHintPair();
+  layout.forEach((pos, index) => {
+    const tile = tiles[index];
+    tile.x = pos.x;
+    tile.y = pos.y;
+    tile.z = pos.z;
 
-    if (!pair) {
-      deepShuffleAllTiles();
-      pair = findSmartHintPair();
+    const el = createTileElement(tile, index);
 
-    }
-    if (!pair) {
-      status.textContent = "Still no moves. Try again.";
-      return;
-    }
-    status.textContent = "New moves available!";
-  }
+    const left = tile.x * TILE_SPACING_X + tile.z * Z_OFFSET_X;
+    const top  = tile.y * TILE_SPACING_Y + tile.z * Z_OFFSET_Y;
 
-  const [i1, i2] = pair;
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.zIndex = tile.z * 10;
 
-  const el1 = document.querySelector(`.tile[data-index="${i1}"]`);
-  const el2 = document.querySelector(`.tile[data-index="${i2}"]`);
-
-  el1.classList.add("selected");
-  el2.classList.add("selected");
-
-  setTimeout(() => {
-    el1.classList.remove("selected");
-    el2.classList.remove("selected");
-    status.textContent = "";
-  }, 1000);
-}
-
-// ------------------------------
-// SHUFFLE FREE TILES ONLY
-// ------------------------------
-function shuffleTiles() {
-  const freeIndices = tiles
-    .map((t, i) => ({ tile: t, index: i }))
-    .filter(obj => !obj.tile.matched)
-    .filter(obj => {
-      const el = document.querySelector(`.tile[data-index="${obj.index}"]`);
-      return el && !el.classList.contains("blocked");
-    })
-    .map(obj => obj.index);
-
-  if (freeIndices.length < 2) return;
-
-  const freeNames = freeIndices.map(i => tiles[i].name);
-  shuffle(freeNames);
-
-  freeIndices.forEach((tileIndex, k) => {
-    tiles[tileIndex].name = freeNames[k];
-    const el = document.querySelector(`.tile[data-index="${tileIndex}"]`);
-    if (el) el.src = "png/" + tiles[tileIndex].name;
+    board.appendChild(el);
   });
 
   updateBlockedStates();
+
+  if (!hasAnyMoves()) {
+    status.textContent = "No moves after shuffle. Try again.";
+  } else {
+    status.textContent = "New moves available.";
+  }
 }
 
 // ------------------------------
@@ -536,6 +345,40 @@ function updateBlockedStates() {
 }
 
 // ------------------------------
+// SIMPLE HINT (FIRST FREE PAIR)
+// ------------------------------
+function showHint() {
+  const status = document.getElementById("status");
+  const free = getFreeTiles(tiles);
+  const pairs = getMatchingPairs(free);
+
+  if (pairs.length === 0) {
+    status.textContent = "No moves. Try shuffle.";
+    return;
+  }
+
+  const [a, b] = pairs[0];
+
+  const idx1 = tiles.indexOf(a);
+  const idx2 = tiles.indexOf(b);
+
+  const el1 = document.querySelector(`.tile[data-index="${idx1}"]`);
+  const el2 = document.querySelector(`.tile[data-index="${idx2}"]`);
+
+  if (!el1 || !el2) return;
+
+  el1.classList.add("selected");
+  el2.classList.add("selected");
+  status.textContent = "Hint shown.";
+
+  setTimeout(() => {
+    el1.classList.remove("selected");
+    el2.classList.remove("selected");
+    status.textContent = "";
+  }, 800);
+}
+
+// ------------------------------
 // TILE CLICK HANDLER
 // ------------------------------
 function onTileClick(e) {
@@ -577,6 +420,8 @@ function onTileClick(e) {
 
       if (tiles.every(t => t.matched)) {
         status.textContent = "You cleared the board! 🎉";
+      } else if (!hasAnyMoves()) {
+        status.textContent = "No moves left. Try shuffle.";
       }
 
       updateBlockedStates();
@@ -604,12 +449,3 @@ document.addEventListener("DOMContentLoaded", () => {
     shuffleUntilSolvable();
   });
 });
-
-
-
-
-
-
-
-
-
