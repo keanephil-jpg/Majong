@@ -134,3 +134,34 @@ button:active {
   opacity: 0.45;
   pointer-events: none;
 }
+/* ------------------------------
+   RESPONSIVE SCALING
+------------------------------ */
+#board {
+  transform-origin: top left;
+}
+
+@media (max-width: 1200px) {
+  #board {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1050px) {
+  #board {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 900px) {
+  #board {
+    transform: scale(0.7);
+  }
+}
+
+@media (max-width: 780px) {
+  #board {
+    transform: scale(0.6);
+  }
+}
+
