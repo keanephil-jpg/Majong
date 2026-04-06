@@ -1,3 +1,6 @@
+/* ------------------------------
+   GLOBAL PAGE BACKGROUND
+------------------------------ */
 body {
   margin: 0;
   padding: 0;
@@ -10,9 +13,11 @@ body {
   min-height: 100vh;
 }
 
-/* Game wrapper with subtle panel effect */
+/* ------------------------------
+   GAME WRAPPER PANEL
+------------------------------ */
 #game-wrapper {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.92);
   border-radius: 16px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
   padding: 24px 32px 32px;
@@ -21,7 +26,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Center title and controls */
+/* ------------------------------
+   TITLE + CONTROLS
+------------------------------ */
 #game-wrapper h1 {
   text-align: center;
   margin-top: 0;
@@ -34,57 +41,96 @@ body {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
+button {
+  background: #334155;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+button:hover {
+  background: #475569;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* ------------------------------
+   STATUS TEXT
+------------------------------ */
 #status {
   text-align: center;
-  min-height: 20px;
-  margin-bottom: 8px;
+  min-height: 24px;
+  margin-bottom: 10px;
   font-size: 0.95rem;
   color: #e5e7eb;
 }
 
-/* Board area sits on a soft panel */
+/* ------------------------------
+   BOARD AREA (MAHJONG TABLE)
+------------------------------ */
 #board {
   position: relative;
   margin: 0 auto;
-  width: 900px;   /* adjust if needed */
-  height: 600px;  /* adjust if needed */
+  width: 900px;
+  height: 600px;
   background: radial-gradient(circle at top, #1f2937 0%, #020617 70%);
   border-radius: 12px;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
   overflow: hidden;
 }
 
+/* ------------------------------
+   TILE APPEARANCE
+------------------------------ */
 .tile {
   position: absolute;
   width: 90px;
   height: 128px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+
+  /* Smooth animations */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+  /* Soft shadow */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+
+  /* Slight rounding */
   border-radius: 6px;
+
+  /* White tile base */
   background-color: white;
 }
 
+/* Hover lift (only if not blocked or selected) */
+.tile:not(.blocked):not(.selected):hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.55);
+}
+
+/* ------------------------------
+   SELECTED TILE
+------------------------------ */
 .tile.selected {
   outline: 3px solid #ffcc00;
-  transform: translateY(-10px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.45);
+  transform: translateY(-12px);
+  box-shadow: 0 12px 22px rgba(0,0,0,0.6);
   z-index: 9999;
 }
 
-
+/* ------------------------------
+   BLOCKED TILE (DIMMED)
+------------------------------ */
 .tile.blocked {
   opacity: 0.45;
   pointer-events: none;
-}
-
-
-
-#status {
-  margin-top: 12px;
-  text-align: center;
-  min-height: 24px;
 }
