@@ -350,6 +350,9 @@ function showHint() {
   const free = getFreeTiles(tiles);
   const pairs = getMatchingPairs(free);
 
+  console.log("FREE:", free.length, free);
+  console.log("PAIRS:", pairs.length, pairs);
+
   if (pairs.length === 0) {
     status.textContent = "No moves. Try shuffle.";
     return;
@@ -360,24 +363,27 @@ function showHint() {
   const idx1 = tiles.indexOf(a);
   const idx2 = tiles.indexOf(b);
 
+  console.log("HINT INDEXES:", idx1, idx2);
+
   const el1 = document.querySelector(`.tile[data-index="${idx1}"]`);
   const el2 = document.querySelector(`.tile[data-index="${idx2}"]`);
 
+  console.log("ELEMENTS:", el1, el2);
+
   if (!el1 || !el2) return;
 
-  // Add glow class
   el1.classList.add("hint-glow");
   el2.classList.add("hint-glow");
 
   status.textContent = "Hint shown.";
 
-  // Remove glow after animation
   setTimeout(() => {
     el1.classList.remove("hint-glow");
     el2.classList.remove("hint-glow");
     status.textContent = "";
   }, 1200);
 }
+
 
 // ------------------------------
 // TILE CLICK HANDLER
