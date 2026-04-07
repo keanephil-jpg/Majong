@@ -378,8 +378,9 @@ function showHint() {
 
   const [a, b] = pairs[0];
 
-  const idx1 = tiles.indexOf(a);
-  const idx2 = tiles.indexOf(b);
+  const idx1 = a.id;
+const idx2 = b.id;
+
 
   console.log("HINT INDEXES:", idx1, idx2);
 
