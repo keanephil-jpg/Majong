@@ -211,7 +211,7 @@ updateMovesCounter();
 
   shuffle(tiles);
 
-  layout.forEach((pos, index) => {
+layout.forEach((pos, index) => {
     const tile = tiles[index];
     tile.x = pos.x;
     tile.y = pos.y;
@@ -227,9 +227,12 @@ updateMovesCounter();
     el.style.zIndex = pos.z * 10;
 
     board.appendChild(el);
-  });
+});
 
-  updateBlockedStates();
+// NOW update once
+updateBlockedStates();
+updateMovesCounter();
+
 }
 
 // ------------------------------
