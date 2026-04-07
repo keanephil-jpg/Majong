@@ -170,4 +170,17 @@ button:active {
     transform: scale(0.55);
   }
 }
+/* ------------------------------
+   HINT GLOW ANIMATION
+------------------------------ */
+@keyframes hintGlow {
+  0%   { box-shadow: 0 0 0px 0px rgba(255, 230, 120, 0.0); }
+  50%  { box-shadow: 0 0 18px 8px rgba(255, 230, 120, 0.9); }
+  100% { box-shadow: 0 0 0px 0px rgba(255, 230, 120, 0.0); }
+}
+
+.tile.hint-glow {
+  animation: hintGlow 1.2s ease-in-out;
+  z-index: 9999;
+}
 
