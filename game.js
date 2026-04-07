@@ -425,10 +425,11 @@ function onTileClick(e) {
   thisEl.classList.add("match-fade");
 
   // Remove from view after animation
-  setTimeout(() => {
-    el1.style.visibility = "hidden";
-    thisEl.style.visibility = "hidden";
-  }, 350);
+ setTimeout(() => {
+  el1.style.visibility = "hidden";
+  thisEl.style.visibility = "hidden";
+}, 500);
+
 
   firstSelected = null;
   status.textContent = "Match!";
