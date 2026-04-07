@@ -204,6 +204,9 @@ async function setupBoard() {
         z: 0
       });
     }
+    updateBlockedStates();
+updateMovesCounter();
+
   });
 
   shuffle(tiles);
@@ -261,6 +264,8 @@ async function shuffleUntilSolvable() {
   });
 
   updateBlockedStates();
+updateMovesCounter();
+
 
   if (!hasAnyMoves()) {
     status.textContent = "No moves after shuffle. Try again.";
@@ -342,6 +347,14 @@ function updateBlockedStates() {
       el.classList.remove("blocked");
     }
   });
+}
+function updateMovesCounter() {
+  const free = getFreeTiles(tiles);
+  const pairs = getMatchingPairs(free);
+  const moves = pairs.length;
+
+  const movesEl = document.getElementById("moves");
+  movesEl.textContent = `Moves available: ${moves}`;
 }
 
 
@@ -457,6 +470,9 @@ function onTileClick(e) {
     }, 400);
   }
 }
+updateBlockedStates();
+updateMovesCounter();
+
 
 // ------------------------------
 // INITIALISE
