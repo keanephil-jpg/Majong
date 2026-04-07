@@ -355,6 +355,8 @@ function updateMovesCounter() {
 
   const movesEl = document.getElementById("moves");
   movesEl.textContent = `Moves available: ${moves}`;
+  console.log("FREE TILES:", free.length);
+
 }
 
 
