@@ -417,10 +417,22 @@ function onTileClick(e) {
     tiles[firstSelected.index].matched = true;
     tiles[index].matched = true;
 
-    setTimeout(() => {
-      const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
-      el1.style.visibility = "hidden";
-      thisEl.style.visibility = "hidden";
+   setTimeout(() => {
+  const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
+
+  // Add fade animation
+  el1.classList.add("match-fade");
+  thisEl.classList.add("match-fade");
+
+  // Remove from view after animation
+  setTimeout(() => {
+    el1.style.visibility = "hidden";
+    thisEl.style.visibility = "hidden";
+  }, 350);
+
+  firstSelected = null;
+  status.textContent = "Match!";
+
 
       firstSelected = null;
       status.textContent = "Match!";
