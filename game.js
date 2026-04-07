@@ -344,9 +344,7 @@ function updateBlockedStates() {
   });
 }
 
-// ------------------------------
-// SIMPLE HINT (FIRST FREE PAIR)
-// ------------------------------
+
 function showHint() {
   const status = document.getElementById("status");
   const free = getFreeTiles(tiles);
@@ -367,15 +365,18 @@ function showHint() {
 
   if (!el1 || !el2) return;
 
-  el1.classList.add("selected");
-  el2.classList.add("selected");
+  // Add glow class
+  el1.classList.add("hint-glow");
+  el2.classList.add("hint-glow");
+
   status.textContent = "Hint shown.";
 
+  // Remove glow after animation
   setTimeout(() => {
-    el1.classList.remove("selected");
-    el2.classList.remove("selected");
+    el1.classList.remove("hint-glow");
+    el2.classList.remove("hint-glow");
     status.textContent = "";
-  }, 800);
+  }, 1200);
 }
 
 // ------------------------------
