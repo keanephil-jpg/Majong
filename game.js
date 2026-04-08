@@ -224,8 +224,13 @@ layout.forEach((pos, index) => {
 
     const el = createTileElement(tile, index);
 
-    const left = pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
-    const top  = pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+    // Center the tile layout inside the 1200x900 board
+const offsetX = (1200 - (15 * TILE_SPACING_X)) / 2;
+const offsetY = (900 - (8 * TILE_SPACING_Y)) / 2;
+
+const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
+const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+
 
     el.style.left = left + "px";
     el.style.top = top + "px";
@@ -260,9 +265,13 @@ async function shuffleUntilSolvable() {
     tile.z = pos.z;
 
     const el = createTileElement(tile, index);
+// Center the tile layout inside the 1200x900 board
+const offsetX = (1200 - (15 * TILE_SPACING_X)) / 2;
+const offsetY = (900 - (8 * TILE_SPACING_Y)) / 2;
 
-    const left = tile.x * TILE_SPACING_X + tile.z * Z_OFFSET_X;
-    const top  = tile.y * TILE_SPACING_Y + tile.z * Z_OFFSET_Y;
+const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
+const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+
 
     el.style.left = left + "px";
     el.style.top = top + "px";
