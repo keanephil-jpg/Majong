@@ -8,6 +8,8 @@ let firstSelected = null;
 // ------------------------------
 // TILE GEOMETRY CONSTANTS
 // ------------------------------
+const BOARD_WIDTH = 1200;
+const BOARD_HEIGHT = 900;
 const TILE_WIDTH = 90;
 const TILE_HEIGHT = 128;
 const TILE_SPACING_X = 70;
@@ -228,8 +230,16 @@ layout.forEach((pos, index) => {
 const offsetX = (1200 - (15 * TILE_SPACING_X)) / 2;
 const offsetY = (900 - (8 * TILE_SPACING_Y)) / 2;
 
+// Center the tile layout inside the board
+const layoutWidth = 15 * TILE_SPACING_X;
+const layoutHeight = 8 * TILE_SPACING_Y;
+
+const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
+const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
+
 const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
 const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+
 
 
     el.style.left = left + "px";
@@ -269,8 +279,16 @@ async function shuffleUntilSolvable() {
 const offsetX = (1200 - (15 * TILE_SPACING_X)) / 2;
 const offsetY = (900 - (8 * TILE_SPACING_Y)) / 2;
 
+// Center the tile layout inside the board
+const layoutWidth = 15 * TILE_SPACING_X;
+const layoutHeight = 8 * TILE_SPACING_Y;
+
+const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
+const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
+
 const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
 const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+
 
 
     el.style.left = left + "px";
