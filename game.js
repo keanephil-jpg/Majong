@@ -25,9 +25,19 @@ const COLLISION_MARGIN_Y = 14;
 // LOAD LAYOUT FILE
 // ------------------------------
 async function loadLayout() {
-  const response = await fetch("layout-turtle.json");
-  layout = await response.json();
+  try {
+    const response = await fetch("./layout-turtle.json");
+    if (!response.ok) {
+      console.error("Failed to load layout-turtle.json:", response.status, response.statusText);
+      return;
+    }
+    layout = await response.json();
+    console.log("Layout loaded, tiles:", layout.length);
+  } catch (err) {
+    console.error("Error loading layout-turtle.json:", err);
+  }
 }
+
 
 // ------------------------------
 // TILE FILENAMES
