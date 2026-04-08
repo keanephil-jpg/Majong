@@ -126,38 +126,43 @@ function isTileFreeData(board, tile) {
 
   const rect = getRectData(tile);
 
+  // Any tile with HIGHER z that overlaps counts as "above"
   const hasAbove = board.some(t => {
     if (t.id === tile.id || t.matched) return false;
-    if (t.z !== tile.z + 1) return false;
+    if (t.z <= tile.z) return false;          // <-- key change: any higher z
     return overlapsRect(rect, getRectData(t));
   });
 
   if (hasAbove) return false;
 
+  // Check left side
   const leftBlocked = board.some(t => {
     if (t.id === tile.id || t.matched) return false;
     if (t.z !== tile.z) return false;
 
     const r = getRectData(t);
     const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
-    const touchesLeft = r.right > rect.left - 5 && r.right <= rect.left + 20;
+    const touchesLeft = r.right > rect.left - 5 && r.right < rect.left + 25;
 
     return verticalOverlap && touchesLeft;
   });
 
+  // Check right side
   const rightBlocked = board.some(t => {
     if (t.id === tile.id || t.matched) return false;
     if (t.z !== tile.z) return false;
 
     const r = getRectData(t);
     const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
-    const touchesRight = r.left < rect.right + 5 && r.left >= rect.right - 20;
+    const touchesRight = r.left < rect.right + 5 && r.left > rect.right - 25;
 
     return verticalOverlap && touchesRight;
   });
 
-  return !(leftBlocked && rightBlocked);
+  // Free if left OR right is open
+  return (!leftBlocked || !rightBlocked);
 }
+
 
 function getFreeTiles(board) {
   return board.filter(t => !t.matched && isTileFreeData(board, t));
