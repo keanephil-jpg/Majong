@@ -361,7 +361,7 @@ function updateMovesCounter() {
   const pairs = getMatchingPairs(free);
   const moves = pairs.length;
 
-  const movesEl = document.getElementById("moves");
+  const movesEl = document.getElementById("moves-display");
   movesEl.textContent = `Moves available: ${moves}`;
   console.log("FREE TILES:", free.length);
 
