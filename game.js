@@ -197,6 +197,7 @@ async function setupBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
 
+  // Build tile set
   tiles = [];
   tileNames.forEach(name => {
     for (let i = 0; i < 4; i++) {
@@ -219,6 +220,7 @@ async function setupBoard() {
   const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
   const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
 
+  // Place tiles
   layout.forEach((pos, index) => {
     const tile = tiles[index];
     tile.x = pos.x;
@@ -240,7 +242,6 @@ async function setupBoard() {
   updateBlockedStates();
   updateMovesCounter();
 }
-
 
 // ------------------------------
 // SHUFFLE BOARD (NO SOLVER, CLEAN REBUILD)
