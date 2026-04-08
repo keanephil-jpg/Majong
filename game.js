@@ -277,15 +277,15 @@ async function shuffleUntilSolvable() {
 
   updateBlockedStates();
   updateMovesCounter();
-}
 
-
+  const status = document.getElementById("status");
   if (!hasAnyMoves()) {
     status.textContent = "No moves after shuffle. Try again.";
   } else {
     status.textContent = "New moves available.";
   }
 }
+
 
 // ------------------------------
 // BLOCKING LOGIC (pixel-accurate)
