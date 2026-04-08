@@ -10,12 +10,12 @@ let firstSelected = null;
 // ------------------------------
 const BOARD_WIDTH = 1200;
 const BOARD_HEIGHT = 900;
-const TILE_WIDTH = 90;
-const TILE_HEIGHT = 128;
-const TILE_SPACING_X = 80;
-const TILE_SPACING_Y = 110;
-const Z_OFFSET_X = -8;
-const Z_OFFSET_Y = -8;
+const TILE_WIDTH = 80;
+const TILE_HEIGHT = 112;
+const TILE_SPACING_X = 70;
+const TILE_SPACING_Y = 95;
+const Z_OFFSET_X = -6;
+const Z_OFFSET_Y = -6;
 
 // Shrink collision box to ignore transparent PNG padding
 const COLLISION_MARGIN_X = 10;
