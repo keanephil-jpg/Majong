@@ -10,9 +10,8 @@ let firstSelected = null;
 // ------------------------------
 const BOARD_WIDTH = 1200;
 const BOARD_HEIGHT = 900;
-const TILE_WIDTH = 90;
-const TILE_HEIGHT = 128;
-const TILE_SPACING_X = 70;
+const TILE_WIDTH = 110;
+const TILE_HEIGHT = 150;
 const TILE_SPACING_Y = 100;
 const Z_OFFSET_X = -8;
 const Z_OFFSET_Y = -8;
@@ -326,14 +325,14 @@ function updateBlockedStates() {
 
    const hasAbove = tiles.some((t, i) => {
   if (i === index || t.matched) return false;
-  if (t.z <= tile.z) return false;   // <-- FIX: ANY tile above blocks
+  if (t.z <= tile.z) return false;  // <-- FIX: ANY tile above blocks
   return overlaps(rect, getRect(t));
 });
 
 
     const leftBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
-      if (t.z !== tile.z) return false;
+      if (t.z <= tile.z) return false;
 
       const r = getRect(t);
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
@@ -344,7 +343,7 @@ function updateBlockedStates() {
 
     const rightBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
-      if (t.z !== tile.z) return false;
+      if (t.z <= tile.z) return false;
 
       const r = getRect(t);
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
