@@ -324,11 +324,12 @@ function updateBlockedStates() {
 
     const rect = getRect(tile);
 
-    const hasAbove = tiles.some((t, i) => {
-      if (i === index || t.matched) return false;
-      if (t.z !== tile.z + 1) return false;
-      return overlaps(rect, getRect(t));
-    });
+   const hasAbove = tiles.some((t, i) => {
+  if (i === index || t.matched) return false;
+  if (t.z <= tile.z) return false;   // <-- FIX: ANY tile above blocks
+  return overlaps(rect, getRect(t));
+});
+
 
     const leftBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
