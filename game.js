@@ -12,7 +12,8 @@ const BOARD_WIDTH = 1200;
 const BOARD_HEIGHT = 900;
 const TILE_WIDTH = 110;
 const TILE_HEIGHT = 150;
-const TILE_SPACING_Y = 100;
+const TILE_SPACING_X = 90;
+const TILE_SPACING_Y = 120;
 const Z_OFFSET_X = -8;
 const Z_OFFSET_Y = -8;
 
@@ -130,7 +131,7 @@ function isTileFreeData(board, tile) {
   // Any tile with HIGHER z that overlaps counts as "above"
   const hasAbove = board.some(t => {
     if (t.id === tile.id || t.matched) return false;
-    if (t.z <= tile.z) return false;          // <-- key change: any higher z
+    if (t.z <= tile.z) return false;
     return overlapsRect(rect, getRectData(t));
   });
 
@@ -164,7 +165,6 @@ function isTileFreeData(board, tile) {
   return (!leftBlocked || !rightBlocked);
 }
 
-
 function getFreeTiles(board) {
   return board.filter(t => !t.matched && isTileFreeData(board, t));
 }
@@ -194,7 +194,9 @@ async function setupBoard() {
   await loadLayout();
 
   const board = document.getElementById("board");
+  const status = document.getElementById("status");
   board.innerHTML = "";
+  if (status) status.textContent = "";
 
   // Build tile set
   tiles = [];
@@ -243,13 +245,15 @@ async function setupBoard() {
 }
 
 // ------------------------------
-// SHUFFLE BOARD (NO SOLVER, CLEAN REBUILD)
+// SHUFFLE BOARD
 // ------------------------------
 async function shuffleUntilSolvable() {
   shuffle(tiles);
 
   const board = document.getElementById("board");
+  const status = document.getElementById("status");
   board.innerHTML = "";
+  if (status) status.textContent = "Shuffling...";
 
   const layoutWidth = 15 * TILE_SPACING_X;
   const layoutHeight = 8 * TILE_SPACING_Y;
@@ -277,14 +281,14 @@ async function shuffleUntilSolvable() {
   updateBlockedStates();
   updateMovesCounter();
 
-  const status = document.getElementById("status");
-  if (!hasAnyMoves()) {
-    status.textContent = "No moves after shuffle. Try again.";
-  } else {
-    status.textContent = "New moves available.";
+  if (status) {
+    if (!hasAnyMoves()) {
+      status.textContent = "No moves after shuffle. Try again.";
+    } else {
+      status.textContent = "New moves available.";
+    }
   }
 }
-
 
 // ------------------------------
 // BLOCKING LOGIC (pixel-accurate)
@@ -323,16 +327,16 @@ function updateBlockedStates() {
 
     const rect = getRect(tile);
 
-   const hasAbove = tiles.some((t, i) => {
-  if (i === index || t.matched) return false;
-  if (t.z <= tile.z) return false;  // <-- FIX: ANY tile above blocks
-  return overlaps(rect, getRect(t));
-});
-
+    // Any tile above blocks
+    const hasAbove = tiles.some((t, i) => {
+      if (i === index || t.matched) return false;
+      if (t.z <= tile.z) return false;
+      return overlaps(rect, getRect(t));
+    });
 
     const leftBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
-      if (t.z <= tile.z) return false;
+      if (t.z !== tile.z) return false;
 
       const r = getRect(t);
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
@@ -343,7 +347,7 @@ function updateBlockedStates() {
 
     const rightBlocked = tiles.some((t, i) => {
       if (i === index || t.matched) return false;
-      if (t.z <= tile.z) return false;
+      if (t.z !== tile.z) return false;
 
       const r = getRect(t);
       const verticalOverlap = !(r.bottom <= rect.top || r.top >= rect.bottom);
@@ -361,58 +365,52 @@ function updateBlockedStates() {
     }
   });
 }
+
+// ------------------------------
+// MOVES COUNTER
+// ------------------------------
 function updateMovesCounter() {
   const free = getFreeTiles(tiles);
   const pairs = getMatchingPairs(free);
   const moves = pairs.length;
 
   const movesEl = document.getElementById("moves-display");
-  movesEl.textContent = `Moves available: ${moves}`;
-  console.log("FREE TILES:", free.length);
-
+  if (movesEl) {
+    movesEl.textContent = `Moves available: ${moves}`;
+  }
 }
 
-
+// ------------------------------
+// HINT
+// ------------------------------
 function showHint() {
   const status = document.getElementById("status");
   const free = getFreeTiles(tiles);
   const pairs = getMatchingPairs(free);
 
-  console.log("FREE:", free.length, free);
-  console.log("PAIRS:", pairs.length, pairs);
-
   if (pairs.length === 0) {
-    status.textContent = "No moves. Try shuffle.";
+    if (status) status.textContent = "No moves. Try shuffle.";
     return;
   }
 
   const [a, b] = pairs[0];
 
-  const idx1 = a.id;
-const idx2 = b.id;
-
-
-  console.log("HINT INDEXES:", idx1, idx2);
-
-  const el1 = document.querySelector(`.tile[data-index="${idx1}"]`);
-  const el2 = document.querySelector(`.tile[data-index="${idx2}"]`);
-
-  console.log("ELEMENTS:", el1, el2);
+  const el1 = document.querySelector(`.tile[data-index="${a.id}"]`);
+  const el2 = document.querySelector(`.tile[data-index="${b.id}"]`);
 
   if (!el1 || !el2) return;
 
   el1.classList.add("hint-glow");
   el2.classList.add("hint-glow");
 
-  status.textContent = "Hint shown.";
+  if (status) status.textContent = "Hint shown.";
 
   setTimeout(() => {
     el1.classList.remove("hint-glow");
     el2.classList.remove("hint-glow");
-    status.textContent = "";
+    if (status) status.textContent = "";
   }, 1200);
 }
-
 
 // ------------------------------
 // TILE CLICK HANDLER
@@ -429,14 +427,14 @@ function onTileClick(e) {
   if (firstSelected && firstSelected.index === index) {
     thisEl.classList.remove("selected");
     firstSelected = null;
-    status.textContent = "";
+    if (status) status.textContent = "";
     return;
   }
 
   if (!firstSelected) {
     firstSelected = { index, tile };
     thisEl.classList.add("selected");
-    status.textContent = "Select a matching tile.";
+    if (status) status.textContent = "Select a matching tile.";
     return;
   }
 
@@ -446,34 +444,28 @@ function onTileClick(e) {
     tiles[firstSelected.index].matched = true;
     tiles[index].matched = true;
 
-   setTimeout(() => {
-  const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
+    setTimeout(() => {
+      const el1 = document.querySelector(`.tile[data-index="${firstSelected.index}"]`);
 
-  // Add fade animation
-  el1.classList.add("match-fade");
-  thisEl.classList.add("match-fade");
+      el1.classList.add("match-fade");
+      thisEl.classList.add("match-fade");
 
-  // Remove from view after animation
- setTimeout(() => {
-  el1.style.visibility = "hidden";
-  thisEl.style.visibility = "hidden";
-}, 500);
-
-
-  firstSelected = null;
-  status.textContent = "Match!";
-
+      setTimeout(() => {
+        el1.style.visibility = "hidden";
+        thisEl.style.visibility = "hidden";
+      }, 500);
 
       firstSelected = null;
-      status.textContent = "Match!";
+      if (status) status.textContent = "Match!";
 
       if (tiles.every(t => t.matched)) {
-        status.textContent = "You cleared the board! 🎉";
+        if (status) status.textContent = "You cleared the board! 🎉";
       } else if (!hasAnyMoves()) {
-        status.textContent = "No moves left. Try shuffle.";
+        if (status) status.textContent = "No moves left. Try shuffle.";
       }
 
       updateBlockedStates();
+      updateMovesCounter();
     }, 200);
   } else {
     setTimeout(() => {
@@ -482,13 +474,10 @@ function onTileClick(e) {
       thisEl.classList.remove("selected");
 
       firstSelected = null;
-      status.textContent = "No match. Try again.";
+      if (status) status.textContent = "No match. Try again.";
     }, 400);
   }
 }
-updateBlockedStates();
-updateMovesCounter();
-
 
 // ------------------------------
 // INITIALISE
