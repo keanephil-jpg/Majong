@@ -195,64 +195,29 @@ async function setupBoard() {
   await loadLayout();
 
   const board = document.getElementById("board");
-  const status = document.getElementById("status");
   board.innerHTML = "";
-  status.textContent = "";
 
- tiles = [];
-tileNames.forEach(name => {
-  for (let i = 0; i < 4; i++) {
-    tiles.push({
-      id: tiles.length,
-      name,
-      matched: false,
-      x: 0,
-      y: 0,
-      z: 0
-    });
-  }
-});
-
-// ❗ Only update AFTER tiles are placed on the board
-
+  tiles = [];
+  tileNames.forEach(name => {
+    for (let i = 0; i < 4; i++) {
+      tiles.push({
+        id: tiles.length,
+        name,
+        matched: false,
+        x: 0,
+        y: 0,
+        z: 0
+      });
+    }
+  });
 
   shuffle(tiles);
 
-layout.forEach((pos, index) => {
-  const tile = tiles[index];
-  tile.x = pos.x;
-  tile.y = pos.y;
-  tile.z = pos.z;
-
-  const el = createTileElement(tile, index);
-
-  const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
-  const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
-
-  el.style.left = left + "px";
-  el.style.top = top + "px";
-  el.style.zIndex = pos.z * 10;
-
-  board.appendChild(el);
-});
-
-// NOW update once tiles exist
-updateBlockedStates();
-updateMovesCounter();
-
-
-// ------------------------------
-// SHUFFLE BOARD (NO SOLVER, CLEAN REBUILD)
-// ------------------------------
-async function shuffleUntilSolvable() {
-  const status = document.getElementById("status");
-  status.textContent = "Shuffling...";
-
-  // Simple: shuffle tiles and rebuild board
-  shuffle(tiles);
-
-  const board = document.getElementById("board");
-  board.innerHTML = "";
+  // Centering offsets
+  const layoutWidth = 15 * TILE_SPACING_X;
+  const layoutHeight = 8 * TILE_SPACING_Y;
+  const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
+  const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
 
   layout.forEach((pos, index) => {
     const tile = tiles[index];
@@ -261,31 +226,57 @@ async function shuffleUntilSolvable() {
     tile.z = pos.z;
 
     const el = createTileElement(tile, index);
-// Center the tile layout inside the 1200x900 board
-const offsetX = (1200 - (15 * TILE_SPACING_X)) / 2;
-const offsetY = (900 - (8 * TILE_SPACING_Y)) / 2;
 
-// Center the tile layout inside the board
-const layoutWidth = 15 * TILE_SPACING_X;
-const layoutHeight = 8 * TILE_SPACING_Y;
-
-const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
-const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
-
-const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
-const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
-
-
+    const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
+    const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
 
     el.style.left = left + "px";
     el.style.top = top + "px";
-    el.style.zIndex = tile.z * 10;
+    el.style.zIndex = pos.z * 10;
 
     board.appendChild(el);
   });
 
   updateBlockedStates();
-updateMovesCounter();
+  updateMovesCounter();
+}
+
+
+// ------------------------------
+// SHUFFLE BOARD (NO SOLVER, CLEAN REBUILD)
+// ------------------------------
+async function shuffleUntilSolvable() {
+  shuffle(tiles);
+
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+
+  const layoutWidth = 15 * TILE_SPACING_X;
+  const layoutHeight = 8 * TILE_SPACING_Y;
+  const offsetX = (BOARD_WIDTH - layoutWidth) / 2;
+  const offsetY = (BOARD_HEIGHT - layoutHeight) / 2;
+
+  layout.forEach((pos, index) => {
+    const tile = tiles[index];
+    tile.x = pos.x;
+    tile.y = pos.y;
+    tile.z = pos.z;
+
+    const el = createTileElement(tile, index);
+
+    const left = offsetX + pos.x * TILE_SPACING_X + pos.z * Z_OFFSET_X;
+    const top  = offsetY + pos.y * TILE_SPACING_Y + pos.z * Z_OFFSET_Y;
+
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.zIndex = pos.z * 10;
+
+    board.appendChild(el);
+  });
+
+  updateBlockedStates();
+  updateMovesCounter();
+}
 
 
   if (!hasAnyMoves()) {
