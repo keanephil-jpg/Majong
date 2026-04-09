@@ -1,15 +1,1 @@
-# Ignore all SVGs
-*.svg
-
-# Ignore Inkscape autosave files
-*.svg~
-
-# Ignore Python cache
-__pycache__/
-*.pyc
-
-# Allow PNGs (tracked)
-!*.png
-
-# Allow the python script
-!generate_tiles.py
+/text
