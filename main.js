@@ -53,7 +53,7 @@ function executeMove(tile, selectedTile, coord, coord2) {
         remove(coord, currentCoords);
         remove(coord2, currentCoords);
         if (currentCoords.length === 0) {
-            writeStatus("You won! 🎉");
+            writeStatus("You da Girl Cathy! 🎉");
         } else {
             checkMovePossible("Computing...");
         }
