@@ -146,6 +146,33 @@ button:hover {
 .tile {
     position: absolute;
 }
+/* === Tile visual upgrades for Cathy === */
+.tile {
+    border-radius: 6px;
+    border: 2px solid #d0d0d0;
+    background: linear-gradient(to bottom right, #f8f8f8, #dcdcdc);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.55);
+}
+
+.tile.selected {
+    outline: 4px solid #00aaff;
+    outline-offset: -4px;
+}
+
+.tile.free {
+    box-shadow: 0px 0px 12px 4px rgba(255, 255, 0, 0.6);
+}
+
+.tile.season {
+    background-color: #CFFFEA; /* mint green */
+    border-color: #88D6B8;
+}
 
 .tileFront {
     position: absolute;
