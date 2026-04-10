@@ -3,7 +3,7 @@ import { TILE_WIDTH, TILE_HEIGHT, images } from "./images.js";
 
 const TILE_DEPTH = 10;
 const TOTAL_OFFSET_TOP = 24;
-const TOTAL_OFFSET_LEFT = 80;
+const TOTAL_OFFSET_LEFT = 60;
 const TILE_ROUNDNESS = 7;
 
 export function createTiles(options) {
