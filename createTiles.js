@@ -1,7 +1,7 @@
 import { COORDINATES } from "./coordinates.js";
 import { TILE_WIDTH, TILE_HEIGHT, images } from "./images.js";
 
-const TILE_DEPTH = 20;
+const TILE_DEPTH = 13;
 const TOTAL_OFFSET_TOP = 30;
 const TOTAL_OFFSET_LEFT = 80;
 const TILE_ROUNDNESS = 7;
