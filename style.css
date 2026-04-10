@@ -135,7 +135,7 @@ button:hover {
 
 #game {
     height: var(--base-height);
-    background: #0a5;  no-repeat center;
+    background: url("./img/Capture.jpg") no-repeat center;
     position: relative;
     border-radius: 5px;
     opacity: 0;
