@@ -184,6 +184,48 @@ button:hover {
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.45);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+/* === Colour groups for Cathy to learn matching === */
+
+/* Characters (萬) — red */
+.tileFront[type*="wan"] {
+    background-color: #ffe5e5 !important;
+}
+
+/* Bamboo (索) — green */
+.tileFront[type*="suo"] {
+    background-color: #e5ffe5 !important;
+}
+
+/* Dots (筒) — blue */
+.tileFront[type*="tong"] {
+    background-color: #e5f0ff !important;
+}
+
+/* Winds — yellow */
+.tileFront[type*="east"],
+.tileFront[type*="south"],
+.tileFront[type*="west"],
+.tileFront[type*="north"] {
+    background-color: #fff7cc !important;
+}
+
+/* Dragons — pink */
+.tileFront[type*="red"],
+.tileFront[type*="green"],
+.tileFront[type*="white"] {
+    background-color: #ffe6f2 !important;
+}
+
+/* Seasons — mint green */
+.tileFront[type*="season"] {
+    background-color: #cfffea !important;
+}
+
+/* Flowers — lavender */
+.tileFront[type*="flower"] {
+    background-color: #f0e5ff !important;
+}
+
 .tile.free .tileFront {
     box-shadow: 0px 0px 18px 6px rgba(255, 255, 0, 0.85);
     filter: brightness(1.15);
