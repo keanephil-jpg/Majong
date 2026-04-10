@@ -140,6 +140,9 @@ button:hover {
     border-radius: 5px;
     opacity: 0;
 }
+#status {
+    color: black;
+}
 
 /* tile */
 
