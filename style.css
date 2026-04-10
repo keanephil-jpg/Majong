@@ -135,7 +135,7 @@ button:hover {
 
 #game {
     height: var(--base-height);
-    background: url("./img/background-small.jpg") no-repeat center;
+    background: #0a5;  no-repeat center;
     position: relative;
     border-radius: 5px;
     opacity: 0;
