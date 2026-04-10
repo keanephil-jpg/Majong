@@ -174,23 +174,20 @@ button:hover {
     border-color: #88D6B8;
 }
 
+/* === Tile visual upgrades for Cathy === */
 .tileFront {
     position: absolute;
-    background-image: linear-gradient(
-        to left top,
-        var(--tile-bottom-right-color),
-        var(--tile-top-left-color)
-    );
-    border: 1px solid var(--tile-border-color);
+    border-radius: 6px;
+    border: 2px solid #d0d0d0;
+    background: linear-gradient(to bottom right, #f8f8f8, #dcdcdc);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.tileFront:hover {
-    cursor: pointer;
-    background-image: linear-gradient(
-        to left top,
-        var(--tile-hover-color),
-        var(--tile-hover-color)
-    );
+
+.tile:hover .tileFront {
+    transform: translateY(-6px);
+    box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.55);
 }
 
 .selectedTile {
